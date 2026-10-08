@@ -20,6 +20,7 @@ export function App() {
   const profile = useApp((s) => s.profile);
   const route = useApp((s) => s.route);
   const dueCount = useApp((s) => s.progress?.dueCount ?? 0);
+  const reviewNonce = useApp((s) => s.reviewNonce);
 
   useEffect(() => {
     void actions.init();
@@ -51,7 +52,7 @@ export function App() {
             type="button"
             className="nav-item"
             aria-current={route === item.route ? 'page' : undefined}
-            onClick={() => actions.navigate(item.route)}
+            onClick={() => (item.route === 'review' ? actions.startReview() : actions.navigate(item.route))}
           >
             <span aria-hidden="true">{item.icon}</span>
             {item.label}
@@ -63,7 +64,7 @@ export function App() {
       <main className="main">
         <UpdateBanner />
         {route === 'dashboard' && <Dashboard />}
-        {route === 'review' && <ReviewSession key="review" />}
+        {route === 'review' && <ReviewSession key={`review-${reviewNonce}`} />}
         {route === 'assistant' && <Assistant />}
         {route === 'settings' && <Settings />}
       </main>

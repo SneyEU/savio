@@ -62,3 +62,21 @@ describe('Série (streak)', () => {
     expect(longestStreak([act('2026-01-01'), act('2026-01-02'), act('2026-01-04'), act('2026-01-05'), act('2026-01-06')])).toBe(3);
   });
 });
+
+describe('Objectif quotidien', () => {
+  it('les paliers sont croissants et le palier courant correspond aux minutes', async () => {
+    const { GOAL_TIERS, tierFor } = await import('../../src/core/gamification/goals');
+    for (let i = 1; i < GOAL_TIERS.length; i++) expect(GOAL_TIERS[i]!.minutes).toBeGreaterThan(GOAL_TIERS[i - 1]!.minutes);
+    expect(tierFor(15).label).toBe('Sérieux');
+    expect(tierFor(25).minutes).toBe(20);
+  });
+
+  it('on peut dépasser son objectif : séance bonus après l’avoir atteint', async () => {
+    const { goalStatus, nextSessionMinutes, BONUS_SESSION_MINUTES } = await import('../../src/core/gamification/goals');
+    expect(goalStatus(6, 15)).toMatchObject({ reached: false, remainingMinutes: 9 });
+    expect(goalStatus(22, 15)).toMatchObject({ reached: true, extraMinutes: 7, ratio: 1 });
+    expect(nextSessionMinutes(0, 30)).toBe(30);
+    expect(nextSessionMinutes(13, 15)).toBe(5);
+    expect(nextSessionMinutes(15, 15)).toBe(BONUS_SESSION_MINUTES);
+  });
+});

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { subjectMeta } from '../../core/content/catalog';
 import { Rating, type ReviewItem } from '../../core/domain/types';
 import { actions, services, useApp } from '../../app/store';
+import { goalStatus, nextSessionMinutes } from '../../core/gamification/goals';
 
 const RATINGS: { rating: Rating; label: string; hint: string; key: string }[] = [
   { rating: Rating.Again, label: 'À revoir', hint: 'Je ne savais pas', key: '1' },
@@ -18,6 +19,9 @@ interface Summary {
 
 export function ReviewSession() {
   const profile = useApp((s) => s.profile);
+  const progress = useApp((s) => s.progress);
+  // Figé au montage : la durée de la séance ne change pas pendant qu'on révise.
+  const [sessionMinutes] = useState(() => nextSessionMinutes(progress?.todayMinutes ?? 0, profile?.dailyGoalMinutes ?? 15));
   const [queue, setQueue] = useState<ReviewItem[] | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [summary, setSummary] = useState<Summary>({ reviewed: 0, correct: 0, xp: 0 });
@@ -29,12 +33,12 @@ export function ReviewSession() {
 
   useEffect(() => {
     void services()
-      .engine.planToday(profile?.dailyGoalMinutes ?? 15)
+      .engine.planToday(sessionMinutes)
       .then((plan) => {
         setQueue(plan.queue);
         shownAt.current = Date.now();
       });
-  }, [profile]);
+  }, [sessionMinutes]);
 
   const current = queue?.[0];
 
@@ -97,19 +101,29 @@ export function ReviewSession() {
 
   if (!current) {
     const rate = summary.reviewed > 0 ? Math.round((summary.correct / summary.reviewed) * 100) : 0;
+    const goal = goalStatus(progress?.todayMinutes ?? 0, profile?.dailyGoalMinutes ?? 15);
     return (
       <div className="page review-done">
-        <h1>{summary.reviewed > 0 ? 'Session terminée.' : 'Rien à réviser maintenant.'}</h1>
+        <h1>{summary.reviewed > 0 ? (goal.reached ? 'Objectif du jour atteint !' : 'Séance terminée.') : 'Rien à réviser maintenant.'}</h1>
         {summary.reviewed > 0 ? (
           <p>
-            {summary.reviewed} révision{summary.reviewed > 1 ? 's' : ''}, {rate} % de réussite, +{summary.xp} XP. Les éléments reviendront juste avant
-            que tu les oublies.
+            {summary.reviewed} révision{summary.reviewed > 1 ? 's' : ''}, {rate} % de réussite, +{summary.xp} XP.{' '}
+            {goal.reached
+              ? goal.extraMinutes > 0
+                ? `${goal.extraMinutes} min de plus que ton objectif aujourd’hui. Bravo.`
+                : 'Ta série continue. Tu peux t’arrêter là, ou continuer si tu en as envie.'
+              : `Encore ${goal.remainingMinutes} min pour atteindre ton objectif du jour.`}
           </p>
         ) : (
-          <p className="muted">Tes prochaines révisions apparaîtront ici dès qu’elles seront dues.</p>
+          <p className="muted">Tes prochaines révisions apparaîtront ici dès qu’elles seront dues. Tu peux aussi apprendre avec le tuteur.</p>
         )}
         <div className="row">
-          <button type="button" className="btn btn-primary" onClick={() => actions.navigate('dashboard')}>
+          {summary.reviewed > 0 && (
+            <button type="button" className="btn btn-primary" onClick={() => actions.startReview()}>
+              {goal.reached ? 'Continuer 5 min de plus' : 'Continuer vers mon objectif'}
+            </button>
+          )}
+          <button type="button" className={summary.reviewed > 0 ? 'btn btn-secondary' : 'btn btn-primary'} onClick={() => actions.navigate('dashboard')}>
             Retour à l’accueil
           </button>
           <button type="button" className="btn btn-secondary" onClick={() => actions.navigate('assistant')}>

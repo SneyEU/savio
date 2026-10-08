@@ -19,9 +19,11 @@ export interface AppState {
   progress?: ProgressSummary;
   route: Route;
   theme: ThemeChoice;
+  /** Change à chaque nouvelle séance de révision (permet d'enchaîner une séance bonus). */
+  reviewNonce: number;
 }
 
-let state: AppState = { status: 'loading', profile: null, subjects: [], route: 'dashboard', theme: 'system' };
+let state: AppState = { status: 'loading', profile: null, subjects: [], route: 'dashboard', theme: 'system', reviewNonce: 0 };
 const listeners = new Set<() => void>();
 
 function setState(patch: Partial<AppState>): void {
@@ -78,6 +80,11 @@ export const actions = {
 
   navigate(route: Route): void {
     setState({ route });
+  },
+
+  /** Démarre une nouvelle séance de révision, même si on est déjà sur l'écran de révision. */
+  startReview(): void {
+    setState({ route: 'review', reviewNonce: state.reviewNonce + 1 });
   },
 
   async setTheme(theme: ThemeChoice): Promise<void> {

@@ -8,6 +8,8 @@ Document de reprise : à lire en premier pour savoir où en est le projet.
 
 ### Fait
 
+- **8 oct., 11 h 45** : objectif quotidien par paliers de 5 à 120 min (sélecteur à jalons inspiré de 21st.dev), l’objectif n’est plus une limite (séances bonus de 5 min, « Objectif du jour atteint »), police Fredoka pour l’interface (OFL), Atkinson Hyperlegible pour la lecture
+
 - **8 oct., 11 h** : mises à jour automatiques signées (bandeau au démarrage, section Réglages → Mises à jour, workflow « Publier une version »). Clé publique dans `tauri.conf.json` ; la clé privée vit uniquement dans les secrets GitHub du mainteneur.
 
 - **8 oct., 10 h 30** : catalogue de 42 matières en 6 catégories (langues, maths et sciences, histoire et société, religions, jeux de stratégie, arts), sélecteur avec recherche, onglets et liste défilante, gestion des matières dans les réglages ; christianisme, judaïsme, shogi, xiangqi, go, dames ajoutés avec decks de démarrage ; nouveautés alternées entre matières ; pictogrammes compatibles Windows (pas de drapeaux emoji)

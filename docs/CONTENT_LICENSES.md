@@ -5,6 +5,8 @@ Tout contenu intégré à Savio est listé ici **avant** d’être ajouté au d�
 | Contenu | Emplacement | Origine | Licence | Remarques |
 |---|---|---|---|---|
 | Decks de démarrage : 9 langues, maths, physique, islam, christianisme, judaïsme, échecs, shogi, xiangqi, go, dames | `src/core/content/decks/` | Rédigés pour Savio | CC BY-SA 4.0 | Les cartes religieuses citent leurs références (versets, recueils de hadiths, passages bibliques) et paraphrasent sans reproduire de traduction tierce. |
+| Police Fredoka | `@fontsource/fredoka` | Google Fonts | SIL Open Font License 1.1 | Titres, boutons, navigation |
+| Police Atkinson Hyperlegible | `@fontsource/atkinson-hyperlegible` | Braille Institute | SIL Open Font License 1.1 | Texte courant |
 | Logo et icônes | `public/savio.svg`, `src-tauri/icons/` | Créés pour Savio | CC BY-SA 4.0 | |
 
 ## Sources prévues (phases 2–3), à vérifier avant intégration

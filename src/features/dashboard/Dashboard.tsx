@@ -5,6 +5,7 @@ import { subjectMeta } from '../../core/content/catalog';
 import { hasStarterContent } from '../../core/content/starterDecks';
 import type { DailyActivity } from '../../core/domain/types';
 import type { SessionPlan } from '../../core/engine/sessionPlanner';
+import { goalStatus, nextSessionMinutes } from '../../core/gamification/goals';
 import { toLocalDay } from '../../core/gamification/streak';
 import { actions, services, useApp } from '../../app/store';
 
@@ -23,12 +24,12 @@ export function Dashboard() {
   useEffect(() => {
     const svc = services();
     void svc.repos.activity.list().then(setActivities);
-    void svc.engine.planToday(profile?.dailyGoalMinutes ?? 15).then(setPlan);
+    void svc.engine.planToday(nextSessionMinutes(progress?.todayMinutes ?? 0, profile?.dailyGoalMinutes ?? 15)).then(setPlan);
   }, [progress, profile]);
 
   if (!progress || !profile) return null;
   const now = services().clock.now();
-  const goalRatio = Math.min(1, progress.todayMinutes / Math.max(1, progress.dailyGoalMinutes));
+  const goal = goalStatus(progress.todayMinutes, progress.dailyGoalMinutes);
   const sessionSize = plan ? plan.dueCount + plan.newCount : 0;
 
   return (
@@ -50,10 +51,10 @@ export function Dashboard() {
           </div>
           <div className="goal">
             <div className="goal-bar" role="progressbar" aria-valuemin={0} aria-valuemax={progress.dailyGoalMinutes} aria-valuenow={progress.todayMinutes}>
-              <span style={{ width: `${goalRatio * 100}%` }} />
+              <span style={{ width: `${goal.ratio * 100}%` }} className={goal.reached ? 'is-reached' : undefined} />
             </div>
             <p className="muted">
-              {progress.todayMinutes} / {progress.dailyGoalMinutes} min aujourd’hui · niveau {progress.level.level} · {progress.totalXp} XP
+              {goal.reached ? `Objectif atteint : ${progress.todayMinutes} min${goal.extraMinutes > 0 ? ` (+${goal.extraMinutes})` : ''}` : `${progress.todayMinutes} / ${progress.dailyGoalMinutes} min aujourd’hui`} · niveau {progress.level.level} · {progress.totalXp} XP
             </p>
           </div>
         </div>
@@ -62,13 +63,13 @@ export function Dashboard() {
 
       <section className="next-session">
         <div className="stack">
-          <h2>{sessionSize > 0 ? 'Ta prochaine session' : 'Tout est à jour'}</h2>
+          <h2>{sessionSize === 0 ? 'Tout est à jour' : goal.reached ? 'Envie de continuer ?' : 'Ta prochaine séance'}</h2>
           <p>{plan?.rationale ?? 'Calcul de ta session…'}</p>
           {plan && sessionSize > 0 && <p className="muted">Environ {plan.estimatedMinutes} min.</p>}
         </div>
         <div className="row">
-          <button type="button" className="btn btn-primary" disabled={sessionSize === 0} onClick={() => actions.navigate('review')}>
-            {sessionSize > 0 ? `Réviser ${sessionSize} élément${sessionSize > 1 ? 's' : ''}` : 'Rien à réviser'}
+          <button type="button" className="btn btn-primary" disabled={sessionSize === 0} onClick={() => actions.startReview()}>
+            {sessionSize === 0 ? 'Rien à réviser' : goal.reached ? 'Séance bonus de 5 min' : `Réviser ${sessionSize} élément${sessionSize > 1 ? 's' : ''}`}
           </button>
           <button type="button" className="btn btn-secondary" onClick={() => actions.navigate('assistant')}>
             Demander au tuteur

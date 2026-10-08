@@ -1,4 +1,5 @@
 import { STARTER_DECKS } from '../content/starterDecks';
+import { MAX_DAILY_GOAL, MIN_DAILY_GOAL } from '../gamification/goals';
 import type { DeclaredLevel, LearnerProfile, Motivation, ReviewItem, SubjectId } from '../domain/types';
 import type { Clock, IdGenerator, Repositories } from '../ports';
 import { newSrsState } from '../srs/fsrs';
@@ -21,8 +22,8 @@ export function validateOnboarding(answers: OnboardingAnswers): string[] {
   if (answers.displayName.trim().length === 0) errors.push('Indique un prénom ou un pseudonyme.');
   if (answers.displayName.trim().length > 40) errors.push('Le prénom doit faire 40 caractères au maximum.');
   if (answers.subjects.length === 0) errors.push('Choisis au moins une matière.');
-  if (!Number.isInteger(answers.dailyGoalMinutes) || answers.dailyGoalMinutes < 5 || answers.dailyGoalMinutes > 240)
-    errors.push('L’objectif quotidien doit être compris entre 5 et 240 minutes.');
+  if (!Number.isInteger(answers.dailyGoalMinutes) || answers.dailyGoalMinutes < MIN_DAILY_GOAL || answers.dailyGoalMinutes > MAX_DAILY_GOAL)
+    errors.push(`L’objectif quotidien doit être compris entre ${MIN_DAILY_GOAL} et ${MAX_DAILY_GOAL} minutes.`);
   return errors;
 }
 

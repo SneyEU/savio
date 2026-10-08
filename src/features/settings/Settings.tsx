@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GoalPicker } from '../../components/GoalPicker';
 import { SubjectPicker } from '../../components/SubjectPicker';
 import { createProvider } from '../../core/ai/gateway';
 import type { SubjectId } from '../../core/domain/types';
@@ -118,10 +119,8 @@ export function Settings() {
 
       <section className="surface stack" aria-labelledby="s-learning">
         <h3 id="s-learning">Apprentissage</h3>
-        <div className="field">
-          <label htmlFor="goal">Objectif quotidien : {goal} minutes</label>
-          <input id="goal" type="range" min={5} max={120} step={5} value={goal} onChange={(e) => setGoal(Number(e.target.value))} />
-        </div>
+        <span className="field-label">Objectif quotidien</span>
+        <GoalPicker value={goal} onChange={setGoal} />
         <div>
           <button type="button" className="btn btn-secondary" onClick={saveGoal}>
             Enregistrer l’objectif

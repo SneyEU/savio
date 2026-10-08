@@ -679,3 +679,114 @@ kbd {
     margin: var(--s-3) var(--s-4) 0;
   }
 }
+
+/* ——— Objectif quotidien ——— */
+.goal-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.goal-picker-summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.goal-picker-minutes {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--c-beacon-ink);
+}
+
+.goal-picker-label {
+  font-weight: 700;
+}
+
+.goal-picker-track {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--s-2) 0;
+}
+
+.goal-picker-track::before,
+.goal-picker-fill {
+  content: '';
+  position: absolute;
+  left: 18px;
+  height: 6px;
+  border-radius: var(--r-pill);
+}
+
+.goal-picker-track::before {
+  right: 18px;
+  background: var(--c-line);
+}
+
+.goal-picker-fill {
+  max-width: calc(100% - 36px);
+  background: linear-gradient(90deg, var(--c-tide), var(--c-beacon));
+  transition: width var(--dur-med) var(--ease-out);
+}
+
+.goal-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--c-line);
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-muted);
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background var(--dur-fast);
+}
+
+.goal-dot:hover {
+  transform: scale(1.08);
+}
+
+.goal-dot.is-on {
+  border-color: var(--c-tide);
+  color: var(--c-ink);
+}
+
+.goal-dot[aria-checked='true'] {
+  width: 44px;
+  height: 44px;
+  border-color: var(--c-beacon);
+  background: var(--c-beacon);
+  color: var(--c-on-beacon);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--c-beacon) 25%, transparent);
+}
+
+.goal-dot-value {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.goal-picker-note {
+  font-size: var(--fs-sm);
+}
+
+.goal-bar span.is-reached {
+  background: linear-gradient(90deg, var(--c-beacon), #ffd77a);
+}
+
+@media (max-width: 720px) {
+  .goal-dot {
+    width: 28px;
+    height: 28px;
+  }
+  .goal-dot[aria-checked='true'] {
+    width: 34px;
+    height: 34px;
+  }
+}

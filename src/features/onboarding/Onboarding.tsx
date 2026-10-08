@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GoalPicker } from '../../components/GoalPicker';
 import { SubjectPicker } from '../../components/SubjectPicker';
 import { subjectMeta } from '../../core/content/catalog';
 import type { DeclaredLevel, Motivation, SubjectId } from '../../core/domain/types';
@@ -6,7 +7,6 @@ import { completeOnboarding, proposeDailyPlan, validateOnboarding, type Onboardi
 import { actions, services } from '../../app/store';
 
 const STEPS = ['Bienvenue', 'Matières', 'Temps', 'Motivation', 'Ton plan'] as const;
-const MINUTES = [5, 10, 15, 20, 30, 45, 60];
 const LEVELS: { id: DeclaredLevel; label: string }[] = [
   { id: 'beginner', label: 'Débutant' },
   { id: 'intermediate', label: 'Intermédiaire' },
@@ -120,13 +120,7 @@ export function Onboarding() {
           <section className="stack">
             <h2>Combien de temps par jour ?</h2>
             <p className="muted">Mieux vaut 10 minutes chaque jour qu’une heure par semaine : la régularité fait la mémoire.</p>
-            <div className="segmented segmented-wide" role="radiogroup" aria-label="Minutes par jour">
-              {MINUTES.map((m) => (
-                <button key={m} type="button" role="radio" aria-checked={answers.dailyGoalMinutes === m} onClick={() => update({ dailyGoalMinutes: m })}>
-                  {m} min
-                </button>
-              ))}
-            </div>
+            <GoalPicker value={answers.dailyGoalMinutes} onChange={(m) => update({ dailyGoalMinutes: m })} />
           </section>
         )}
 
