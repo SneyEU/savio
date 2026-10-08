@@ -1,0 +1,30 @@
+# Dépendances et builds
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+coverage/
+
+# Secrets et environnement local
+.env
+.env.*
+!.env.example
+
+# Bases et exports locaux
+*.db
+*.db-journal
+savio-export-*.json
+
+# Modèles IA / voix téléchargés (jamais dans Git)
+models/
+*.gguf
+*.onnx
+*.bin
+
+# Éditeurs et système
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.log

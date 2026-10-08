@@ -1,0 +1,32 @@
+name: Contribuer du contenu
+description: Proposer un deck, une leçon ou une correction de contenu (aucune programmation nécessaire).
+labels: [content]
+body:
+  - type: input
+    id: subject
+    attributes:
+      label: Matière
+      placeholder: Espagnol, échecs, islam, mathématiques…
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: Contenu proposé
+      description: Une carte par ligne au format « recto → verso », avec une note ou une source si utile.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources et licence
+      description: Obligatoire pour l'histoire et la religion. Le contenu doit être original, du domaine public ou sous licence compatible (CC0, CC BY, CC BY-SA).
+    validations:
+      required: true
+  - type: checkboxes
+    id: license
+    attributes:
+      label: Licence
+      options:
+        - label: J'accepte que ce contenu soit publié sous CC BY-SA 4.0
+          required: true

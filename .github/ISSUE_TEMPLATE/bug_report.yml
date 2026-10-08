@@ -1,0 +1,31 @@
+name: Signaler un bug
+description: Quelque chose ne fonctionne pas comme prévu.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Que s'est-il passé ?
+      description: Ce que vous avez fait, ce que vous attendiez, ce qui s'est produit.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      placeholder: "1. Ouvrir…\n2. Cliquer sur…"
+  - type: input
+    id: version
+    attributes:
+      label: Version de Savio
+      placeholder: 0.1.0
+  - type: dropdown
+    id: ai
+    attributes:
+      label: Fournisseur IA utilisé
+      options: [Ollama, Serveur compatible OpenAI, Sans IA, Je ne sais pas]
+  - type: input
+    id: os
+    attributes:
+      label: Système
+      placeholder: Windows 11 23H2

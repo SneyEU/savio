@@ -1,0 +1,102 @@
+/*
+ * Design system Savio — jetons.
+ * Univers : la carte marine. Fond « papier de carte » bleu-gris, encre marine,
+ * ambre de balise pour l'action et la progression, sarcelle pour l'eau et le calme.
+ */
+:root {
+  /* Couleurs — clair */
+  --c-bg: #edf1f3;
+  --c-surface: #ffffff;
+  --c-surface-sunk: #e2e8ec;
+  --c-ink: #14233a;
+  --c-ink-soft: #3d4f66;
+  --c-muted: #5d6d80;
+  --c-line: #cfd8df;
+  --c-beacon: #f2b23e; /* remplissages, progression */
+  --c-beacon-ink: #8a5a06; /* texte ambre lisible sur fond clair */
+  --c-on-beacon: #14233a;
+  --c-tide: #1f7a75;
+  --c-tide-soft: #d5ecea;
+  --c-danger: #b4433a;
+  --c-danger-soft: #f6dedb;
+  --c-focus: #1f6fd1;
+
+  /* Échelons de maîtrise (du plus clair au plus profond, comme une sonde) */
+  --c-m-new: #cfd8df;
+  --c-m-learning: #f6d48f;
+  --c-m-fragile: #f2b23e;
+  --c-m-known: #4db6ac;
+  --c-m-mastered: #1f7a75;
+
+  /* Typographie */
+  --font-display: 'Bricolage Grotesque', 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: 1.875rem;
+  --fs-2xl: 2.75rem;
+  --lh-body: 1.55;
+  --lh-tight: 1.12;
+
+  /* Espacement (base 4 px) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* Rayons : petit pour les contrôles, plus grand pour les surfaces de lecture */
+  --r-control: 8px;
+  --r-surface: 14px;
+  --r-pill: 999px;
+
+  --shadow-lift: 0 1px 2px rgb(20 35 58 / 0.06), 0 8px 24px -12px rgb(20 35 58 / 0.18);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-med: 240ms;
+}
+
+:root[data-theme='dark'] {
+  --c-bg: #0e1a2b;
+  --c-surface: #15243a;
+  --c-surface-sunk: #0b1524;
+  --c-ink: #e6edf5;
+  --c-ink-soft: #c3cfdc;
+  --c-muted: #93a3b8;
+  --c-line: #26384f;
+  --c-beacon-ink: #f2b23e;
+  --c-tide: #4db6ac;
+  --c-tide-soft: #173a3d;
+  --c-danger: #e57d72;
+  --c-danger-soft: #3a1f22;
+  --c-focus: #7fb2ff;
+  --c-m-new: #26384f;
+  --c-m-learning: #6b5426;
+  --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 28px -14px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='system'] {
+    --c-bg: #0e1a2b;
+    --c-surface: #15243a;
+    --c-surface-sunk: #0b1524;
+    --c-ink: #e6edf5;
+    --c-ink-soft: #c3cfdc;
+    --c-muted: #93a3b8;
+    --c-line: #26384f;
+    --c-beacon-ink: #f2b23e;
+    --c-tide: #4db6ac;
+    --c-tide-soft: #173a3d;
+    --c-danger: #e57d72;
+    --c-danger-soft: #3a1f22;
+    --c-focus: #7fb2ff;
+    --c-m-new: #26384f;
+    --c-m-learning: #6b5426;
+    --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 28px -14px rgb(0 0 0 / 0.6);
+  }
+}

@@ -1,0 +1,21 @@
+name: Proposer une amélioration
+description: Une idée pour aider à mieux apprendre.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Quel problème d'apprentissage cela résout-il ?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Votre proposition
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Principes du projet
+      options:
+        - label: Fonctionne sans abonnement et, si possible, hors ligne
+        - label: Les données de l'utilisateur restent sous son contrôle
