@@ -3,7 +3,9 @@
  * branché sur React via useSyncExternalStore. La logique métier reste dans les services.
  */
 import { useSyncExternalStore } from 'react';
-import type { LearnerProfile, SubjectEnrollment } from '../core/domain/types';
+import { flushSync } from 'react-dom';
+import { withViewTransition } from '../components/fx/effects';
+import type { LearnerProfile, SubjectEnrollment, SubjectId } from '../core/domain/types';
 import type { ProgressSummary } from '../core/engine/learningEngine';
 import { createServices, SETTINGS, type AppServices } from '../services/container';
 
@@ -21,6 +23,8 @@ export interface AppState {
   theme: ThemeChoice;
   /** Change à chaque nouvelle séance de révision (permet d'enchaîner une séance bonus). */
   reviewNonce: number;
+  /** Matière ciblée par la séance en cours (clic sur une planète), sinon toutes. */
+  reviewSubject?: SubjectId;
 }
 
 let state: AppState = { status: 'loading', profile: null, subjects: [], route: 'dashboard', theme: 'system', reviewNonce: 0 };
@@ -79,12 +83,14 @@ export const actions = {
   },
 
   navigate(route: Route): void {
-    setState({ route });
+    if (route === state.route) return;
+    // flushSync : React doit avoir peint le nouvel écran avant que la transition en prenne la capture.
+    withViewTransition(() => flushSync(() => setState({ route })));
   },
 
   /** Démarre une nouvelle séance de révision, même si on est déjà sur l'écran de révision. */
-  startReview(): void {
-    setState({ route: 'review', reviewNonce: state.reviewNonce + 1 });
+  startReview(subjectId?: SubjectId): void {
+    withViewTransition(() => flushSync(() => setState({ route: 'review', reviewNonce: state.reviewNonce + 1, reviewSubject: subjectId })));
   },
 
   async setTheme(theme: ThemeChoice): Promise<void> {

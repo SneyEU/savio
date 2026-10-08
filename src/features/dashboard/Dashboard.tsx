@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
+import { CountUp } from '../../components/fx/CountUp';
+import { useMagnet, useReveal } from '../../components/fx/motion';
+import { SplitText } from '../../components/fx/SplitText';
+import { Orrery } from '../../components/Orrery';
+import { Icon } from '../../components/ui/Icon';
 import { MasteryBar } from '../../components/ui/MasteryBar';
 import { Wake } from '../../components/ui/Wake';
-import { subjectMeta } from '../../core/content/catalog';
-import { hasStarterContent } from '../../core/content/starterDecks';
 import type { DailyActivity } from '../../core/domain/types';
 import type { SessionPlan } from '../../core/engine/sessionPlanner';
 import { goalStatus, nextSessionMinutes } from '../../core/gamification/goals';
@@ -15,11 +18,22 @@ function greeting(date: Date): string {
   return 'Bonjour';
 }
 
+/** Une phrase liée à l'état réel de l'apprenant, jamais générique. */
+function statusLine(streak: number, reached: boolean, due: number): string {
+  if (reached) return 'Objectif du jour atteint. Tout ce que tu fais maintenant, c’est du bonus.';
+  if (due > 0) return `${due} carte${due > 1 ? 's' : ''} s’apprête${due > 1 ? 'nt' : ''} à sortir de ta mémoire. C’est le bon moment pour les rattraper.`;
+  if (streak === 0) return 'Ton système est prêt. Quelques minutes suffisent pour lancer ta série.';
+  return `${streak} jour${streak > 1 ? 's' : ''} d’affilée. Garde l’orbite.`;
+}
+
 export function Dashboard() {
   const profile = useApp((s) => s.profile);
   const progress = useApp((s) => s.progress);
   const [activities, setActivities] = useState<DailyActivity[]>([]);
   const [plan, setPlan] = useState<SessionPlan | null>(null);
+  const launchRef = useMagnet<HTMLButtonElement>(0.18);
+  const skyRef = useReveal<HTMLElement>();
+  const spectrumRef = useReveal<HTMLElement>();
 
   useEffect(() => {
     const svc = services();
@@ -33,74 +47,77 @@ export function Dashboard() {
   const sessionSize = plan ? plan.dueCount + plan.newCount : 0;
 
   return (
-    <div className="page">
-      <header className="dash-head">
-        <h1>
-          {greeting(now)}, {profile.displayName}.
-        </h1>
-        <p className="muted">{now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-      </header>
+    <div className="dash">
+      <section className="dash-stage">
+        <div className="dash-intro">
+          <p className="eyebrow-date">{now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          <SplitText text={`${greeting(now)} ${profile.displayName}`} className="dash-title" />
+          <p className="dash-status">{statusLine(progress.streak, goal.reached, progress.dueCount)}</p>
 
-      <section className="wake-panel" aria-labelledby="wake-title">
-        <div className="wake-figures">
-          <div>
-            <h2 id="wake-title" className="wake-streak">
-              {progress.streak > 0 ? `${progress.streak} ${progress.streak > 1 ? 'jours' : 'jour'}` : 'Jour 1'}
-            </h2>
-            <p className="muted">{progress.streak > 0 ? 'de suite. Garde le cap.' : 'Une première session aujourd’hui lance ta série.'}</p>
-          </div>
-          <div className="goal">
-            <div className="goal-bar" role="progressbar" aria-valuemin={0} aria-valuemax={progress.dailyGoalMinutes} aria-valuenow={progress.todayMinutes}>
-              <span style={{ width: `${goal.ratio * 100}%` }} className={goal.reached ? 'is-reached' : undefined} />
-            </div>
-            <p className="muted">
-              {goal.reached ? `Objectif atteint : ${progress.todayMinutes} min${goal.extraMinutes > 0 ? ` (+${goal.extraMinutes})` : ''}` : `${progress.todayMinutes} / ${progress.dailyGoalMinutes} min aujourd’hui`} · niveau {progress.level.level} · {progress.totalXp} XP
+          <div className="launch">
+            <button
+              ref={launchRef}
+              type="button"
+              className="btn btn-primary btn-launch"
+              disabled={sessionSize === 0}
+              onClick={() => actions.startReview()}
+            >
+              <span className="btn-launch-ring" aria-hidden="true" />
+              <Icon name="play" size={20} />
+              {sessionSize === 0 ? 'Rien à réviser' : goal.reached ? 'Séance bonus · 5 min' : 'Lancer la séance'}
+            </button>
+            <p className="launch-meta">
+              {plan && sessionSize > 0 ? `${sessionSize} carte${sessionSize > 1 ? 's' : ''} · environ ${plan.estimatedMinutes} min · ${plan.rationale}` : 'Savi est à jour. Le tuteur peut te faire découvrir autre chose.'}
             </p>
+            <button type="button" className="btn btn-ghost btn-arrow" onClick={() => actions.navigate('assistant')}>
+              Parler au tuteur <Icon name="arrow" size={18} />
+            </button>
           </div>
+
+          <div
+            className={goal.reached ? 'goal-meter is-reached' : 'goal-meter'}
+            role="progressbar"
+            aria-label="Objectif du jour"
+            aria-valuemin={0}
+            aria-valuemax={progress.dailyGoalMinutes}
+            aria-valuenow={progress.todayMinutes}
+          >
+            <div className="goal-meter-track">
+              <span style={{ width: `${goal.ratio * 100}%` }} />
+            </div>
+            <span className="goal-meter-text">
+              <CountUp value={progress.todayMinutes} /> / {progress.dailyGoalMinutes} min
+              {goal.extraMinutes > 0 && <em> +{goal.extraMinutes} bonus</em>}
+            </span>
+          </div>
+        </div>
+
+        <Orrery
+          level={progress.level}
+          totalXp={progress.totalXp}
+          subjects={progress.recommendations}
+          strength={progress.subjectStrength}
+          onPick={(id) => actions.startReview(id)}
+        />
+      </section>
+
+      <section ref={skyRef} className="sky reveal-on-scroll" aria-labelledby="streak-title">
+        <div className="sky-figure">
+          <span className="sky-number">
+            <CountUp value={progress.streak} />
+          </span>
+          <h2 id="streak-title" className="sky-label">
+            {progress.streak > 1 ? 'jours d’affilée' : progress.streak === 1 ? 'jour d’affilée' : 'jour : allume la première étoile'}
+          </h2>
         </div>
         <Wake activities={activities} today={toLocalDay(now)} />
+        <p className="sky-caption">Chaque jour d’étude allume une étoile. Les jours qui se suivent se relient.</p>
       </section>
 
-      <section className="next-session">
-        <div className="stack">
-          <h2>{sessionSize === 0 ? 'Tout est à jour' : goal.reached ? 'Envie de continuer ?' : 'Ta prochaine séance'}</h2>
-          <p>{plan?.rationale ?? 'Calcul de ta session…'}</p>
-          {plan && sessionSize > 0 && <p className="muted">Environ {plan.estimatedMinutes} min.</p>}
-        </div>
-        <div className="row">
-          <button type="button" className="btn btn-primary" disabled={sessionSize === 0} onClick={() => actions.startReview()}>
-            {sessionSize === 0 ? 'Rien à réviser' : goal.reached ? 'Séance bonus de 5 min' : `Réviser ${sessionSize} élément${sessionSize > 1 ? 's' : ''}`}
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={() => actions.navigate('assistant')}>
-            Demander au tuteur
-          </button>
-        </div>
-      </section>
-
-      <section className="stack" aria-labelledby="subjects-title">
-        <h3 id="subjects-title">Tes matières</h3>
-        <ul className="subject-list">
-          {progress.recommendations.map((r) => {
-            const meta = subjectMeta(r.subjectId);
-            return (
-              <li key={r.subjectId}>
-                <span className="subject-emoji" aria-hidden="true">
-                  {meta?.emoji}
-                </span>
-                <span className="subject-name">{meta?.label ?? r.subjectId}</span>
-                <span className="muted subject-status">
-                  {r.action === 'review' && `${r.dueCount} à réviser`}
-                  {r.action === 'learn' && `${r.newAvailable} nouveauté${r.newAvailable > 1 ? 's' : ''}`}
-                  {r.action === 'up_to_date' && (hasStarterContent(r.subjectId) ? 'À jour' : 'Disponible avec le tuteur')}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      <section className="stack" aria-labelledby="mastery-title">
-        <h3 id="mastery-title">Ce que tu retiens</h3>
+      <section ref={spectrumRef} className="spectrum reveal-on-scroll" aria-labelledby="mastery-title">
+        <h2 id="mastery-title" className="section-title">
+          Ce que tu retiens
+        </h2>
         <MasteryBar distribution={progress.mastery} />
       </section>
     </div>

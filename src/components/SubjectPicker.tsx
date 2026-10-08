@@ -51,7 +51,7 @@ export function SubjectPicker({ selected, onToggle }: SubjectPickerProps) {
               {subjects.map((s) => (
                 <button key={s.id} type="button" className="choice" aria-pressed={selected.has(s.id)} onClick={() => onToggle(s.id)}>
                   <span className="choice-emoji" aria-hidden="true">
-                    {s.emoji}
+                    {s.glyph}
                   </span>
                   <span>
                     {s.label}

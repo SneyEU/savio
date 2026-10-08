@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { SplitText } from '../../components/fx/SplitText';
 import { GoalPicker } from '../../components/GoalPicker';
+import { Orrery } from '../../components/Orrery';
+import { Icon } from '../../components/ui/Icon';
 import { SubjectPicker } from '../../components/SubjectPicker';
 import { subjectMeta } from '../../core/content/catalog';
 import type { DeclaredLevel, Motivation, SubjectId } from '../../core/domain/types';
@@ -58,21 +61,36 @@ export function Onboarding() {
     }
   }
 
+  // Le système se forme sous les yeux de l'utilisateur à mesure qu'il choisit ses matières.
+  const preview = answers.subjects.map((s) => ({ subjectId: s.subjectId, dueCount: 0, newAvailable: 0, action: 'learn' as const }));
+
   return (
     <main className="onboarding">
-      <div className="onboarding-card">
+      <div className="ob-preview" aria-hidden={preview.length === 0}>
+        <Orrery
+          level={{ level: 1, xpIntoLevel: 0, xpForNextLevel: 100, ratio: (step + 1) / STEPS.length }}
+          totalXp={0}
+          subjects={preview}
+          strength={{}}
+          onPick={() => undefined}
+        />
+      </div>
+
+      <div className="ob-panel">
         <ol className="steps" aria-label="Étapes">
           {STEPS.map((label, i) => (
             <li key={label} aria-current={i === step ? 'step' : undefined} className={i < step ? 'done' : undefined}>
-              {label}
+              <span className="step-index">{i + 1}</span>
+              <span className="step-label">{label}</span>
             </li>
           ))}
         </ol>
 
+        <div className="ob-step" key={step}>
+
         {step === 0 && (
           <section className="stack">
-            <img src="/savio.svg" alt="" width={56} height={56} />
-            <h1>Apprendre un peu chaque jour, à ton rythme.</h1>
+            <SplitText text="Construis ton système du savoir." className="ob-title" />
             <p className="muted">
               Savio organise tes révisions, t’accompagne avec un tuteur IA et garde toutes tes données sur cet ordinateur. Libre et gratuit.
             </p>
@@ -93,15 +111,15 @@ export function Onboarding() {
 
         {step === 1 && (
           <section className="stack">
-            <h2>Qu’est-ce que tu veux apprendre ?</h2>
-            <p className="muted">Tu pourras en ajouter d’autres plus tard.</p>
+            <h2 className="ob-heading">Quelles planètes veux-tu explorer ?</h2>
+            <p className="muted">Chaque matière devient une planète de ton système. Tu pourras en ajouter d’autres plus tard.</p>
             <SubjectPicker selected={new Set(answers.subjects.map((s) => s.subjectId))} onToggle={toggleSubject} />
             {answers.subjects.length > 0 && (
               <div className="stack">
                 <span className="field-label">Ton niveau</span>
                 {answers.subjects.map(({ subjectId, level }) => (
                   <div key={subjectId} className="row level-row">
-                    <span className="level-subject">{subjectMeta(subjectId)?.emoji} {subjectMeta(subjectId)?.label}</span>
+                    <span className="level-subject">{subjectMeta(subjectId)?.glyph} {subjectMeta(subjectId)?.label}</span>
                     <div className="segmented" role="radiogroup" aria-label={`Niveau en ${subjectMeta(subjectId)?.label ?? subjectId}`}>
                       {LEVELS.map((l) => (
                         <button key={l.id} type="button" role="radio" aria-checked={level === l.id} onClick={() => setLevel(subjectId, l.id)}>
@@ -118,7 +136,7 @@ export function Onboarding() {
 
         {step === 2 && (
           <section className="stack">
-            <h2>Combien de temps par jour ?</h2>
+            <h2 className="ob-heading">Combien de temps par jour ?</h2>
             <p className="muted">Mieux vaut 10 minutes chaque jour qu’une heure par semaine : la régularité fait la mémoire.</p>
             <GoalPicker value={answers.dailyGoalMinutes} onChange={(m) => update({ dailyGoalMinutes: m })} />
           </section>
@@ -126,7 +144,7 @@ export function Onboarding() {
 
         {step === 3 && (
           <section className="stack">
-            <h2>Qu’est-ce qui te motive ?</h2>
+            <h2 className="ob-heading">Qu’est-ce qui te motive ?</h2>
             <div className="choice-grid">
               {MOTIVATIONS.map((m) => (
                 <button key={m.id} type="button" className="choice" aria-pressed={answers.motivation === m.id} onClick={() => update({ motivation: m.id })}>
@@ -150,10 +168,10 @@ export function Onboarding() {
 
         {step === 4 && (
           <section className="stack">
-            <h2>Ton plan pour {answers.dailyGoalMinutes} minutes par jour</h2>
+            <h2 className="ob-heading">Ton plan pour {answers.dailyGoalMinutes} minutes par jour</h2>
             <ul className="plan">
               {proposeDailyPlan(answers.dailyGoalMinutes).map((slot) => (
-                <li key={slot.label}>
+                <li key={slot.label} style={{ ['--share' as string]: `${(slot.minutes / answers.dailyGoalMinutes) * 100}%` }}>
                   <span>{slot.label}</span>
                   <strong>{slot.minutes} min</strong>
                 </li>
@@ -162,6 +180,8 @@ export function Onboarding() {
             <p className="muted">Le plan s’ajuste ensuite à tes réussites et à tes oublis. Tu peux le modifier dans les réglages.</p>
           </section>
         )}
+
+        </div>
 
         {error && <p className="notice notice-danger">{error}</p>}
 
@@ -173,11 +193,11 @@ export function Onboarding() {
           )}
           {step < STEPS.length - 1 ? (
             <button type="button" className="btn btn-primary" disabled={!canContinue} onClick={() => setStep(step + 1)}>
-              Continuer
+              Continuer <Icon name="arrow" size={18} />
             </button>
           ) : (
             <button type="button" className="btn btn-primary" disabled={busy} onClick={finish}>
-              {busy ? 'Préparation…' : 'Commencer'}
+              {busy ? 'Mise en orbite…' : 'Lancer mon système'}
             </button>
           )}
         </div>

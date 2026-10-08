@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { Starfield } from '../components/fx/Starfield';
+import { Icon, type IconName } from '../components/ui/Icon';
 import { UpdateBanner } from '../components/UpdateBanner';
 import { Assistant } from '../features/assistant/Assistant';
 import { Dashboard } from '../features/dashboard/Dashboard';
@@ -7,11 +9,11 @@ import { ReviewSession } from '../features/review/ReviewSession';
 import { Settings } from '../features/settings/Settings';
 import { actions, useApp, type Route } from './store';
 
-const NAV: { route: Route; label: string; icon: string }[] = [
-  { route: 'dashboard', label: 'Accueil', icon: '⌂' },
-  { route: 'review', label: 'Réviser', icon: '◎' },
-  { route: 'assistant', label: 'Tuteur', icon: '✦' },
-  { route: 'settings', label: 'Réglages', icon: '⚙' },
+const NAV: { route: Route; label: string; icon: IconName }[] = [
+  { route: 'dashboard', label: 'Système', icon: 'orbit' },
+  { route: 'review', label: 'Réviser', icon: 'cards' },
+  { route: 'assistant', label: 'Tuteur', icon: 'core' },
+  { route: 'settings', label: 'Réglages', icon: 'sliders' },
 ];
 
 export function App() {
@@ -26,48 +28,76 @@ export function App() {
     void actions.init();
   }, []);
 
-  if (status === 'loading') return <div className="splash muted">Ouverture de Savio…</div>;
+  if (status === 'loading') {
+    return (
+      <div className="splash" aria-busy="true">
+        <Starfield />
+        <div className="boot">
+          <div className="boot-orbits" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <p className="boot-word">Savio</p>
+        </div>
+      </div>
+    );
+  }
+
   if (status === 'error')
     return (
       <div className="splash">
-        <div className="stack">
+        <div className="stack narrow">
           <h2>Savio n’a pas pu démarrer.</h2>
           <p className="notice notice-danger">{error}</p>
           <p className="muted">Ferme l’application et relance-la. Si le problème persiste, signale-le sur GitHub avec ce message.</p>
         </div>
       </div>
     );
-  if (!profile) return <Onboarding />;
+
+  if (!profile)
+    return (
+      <>
+        <Starfield />
+        <Onboarding />
+      </>
+    );
+
+  const focus = route === 'review';
 
   return (
-    <div className="shell">
-      <nav className="sidebar" aria-label="Navigation principale">
-        <div className="brand">
-          <img src="/savio.svg" alt="" />
-          Savio
-        </div>
+    <div className={focus ? 'shell is-focus' : 'shell'} data-route={route}>
+      <Starfield />
+      <header className="topbar">
+        <button type="button" className="wordmark" onClick={() => actions.navigate('dashboard')} aria-label="Savio, retour au système">
+          <img src="/savio.svg" alt="" width={26} height={26} />
+          <span>Savio</span>
+        </button>
+        <UpdateBanner />
+      </header>
+
+      <main className="view" key={route === 'review' ? `review-${reviewNonce}` : route}>
+        {route === 'dashboard' && <Dashboard />}
+        {route === 'review' && <ReviewSession />}
+        {route === 'assistant' && <Assistant />}
+        {route === 'settings' && <Settings />}
+      </main>
+
+      <nav className="dock" aria-label="Navigation principale">
         {NAV.map((item) => (
           <button
             key={item.route}
             type="button"
-            className="nav-item"
+            className="dock-item"
             aria-current={route === item.route ? 'page' : undefined}
             onClick={() => (item.route === 'review' ? actions.startReview() : actions.navigate(item.route))}
           >
-            <span aria-hidden="true">{item.icon}</span>
-            {item.label}
-            {item.route === 'review' && dueCount > 0 && <span className="nav-count">{dueCount}</span>}
+            <Icon name={item.icon} size={22} />
+            <span className="dock-label">{item.label}</span>
+            {item.route === 'review' && dueCount > 0 && <span className="dock-count">{dueCount}</span>}
           </button>
         ))}
-        <p className="sidebar-foot">Libre, gratuit, et tes données restent ici.</p>
       </nav>
-      <main className="main">
-        <UpdateBanner />
-        {route === 'dashboard' && <Dashboard />}
-        {route === 'review' && <ReviewSession key={`review-${reviewNonce}`} />}
-        {route === 'assistant' && <Assistant />}
-        {route === 'settings' && <Settings />}
-      </main>
     </div>
   );
 }

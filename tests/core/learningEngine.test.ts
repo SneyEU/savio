@@ -163,3 +163,18 @@ describe('Graphe de connaissances', () => {
     expect(unlockedSkills(skills, buildLearnerSnapshot(logs, []).skills).map((s) => s.id)).toEqual(['a', 'b']);
   });
 });
+
+describe('Force par matière', () => {
+  it('vaut 0 pour des cartes neuves et augmente avec la maîtrise', async () => {
+    const { subjectStrength } = await import('../../src/core/engine/learningEngine');
+    const base = { kind: 'vocabulary' as const, skillId: 's', front: '', back: '', createdAt: '', updatedAt: '' };
+    const srs = (stability: number, reps: number) => ({ stability, difficulty: 5, reps, lapses: 0, lastReviewedAt: null, dueAt: '' });
+    const result = subjectStrength([
+      { ...base, id: 'a', subjectId: 'spanish', srs: srs(0, 0) },
+      { ...base, id: 'b', subjectId: 'spanish', srs: srs(40, 6) },
+      { ...base, id: 'c', subjectId: 'chess', srs: srs(0, 0) },
+    ]);
+    expect(result.spanish).toBeCloseTo(0.5);
+    expect(result.chess).toBe(0);
+  });
+});

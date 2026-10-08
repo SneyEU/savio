@@ -10,6 +10,8 @@ export interface Category {
   id: CategoryId;
   label: string;
   description: string;
+  /** Couleur de « planète » de la catégorie (identité visuelle des matières). */
+  color: string;
 }
 
 export interface SubjectMeta {
@@ -17,81 +19,91 @@ export interface SubjectMeta {
   label: string;
   category: CategoryId;
   /**
-   * Symbole court affiché devant le nom : code ou écriture de la langue, pictogramme, idéogramme.
-   * Pas de drapeaux emoji : Windows ne les affiche pas (il montre deux lettres à la place).
+   * Glyphe typographique de la matière : code ou écriture de la langue, symbole, monogramme.
+   * Jamais d'emoji : ils changent de style selon le système et font « gadget ».
    */
-  emoji: string;
+  glyph: string;
   /** Mots-clés supplémentaires pour la recherche. */
   keywords?: string[];
 }
 
 export const CATEGORIES: Category[] = [
-  { id: 'languages', label: 'Langues', description: 'Vocabulaire, grammaire, conversation' },
-  { id: 'sciences', label: 'Maths et sciences', description: 'Calcul, raisonnement, sciences de la nature' },
-  { id: 'humanities', label: 'Histoire et société', description: 'Histoire, géographie, idées' },
-  { id: 'religions', label: 'Religions et spiritualités', description: 'Croyances, textes, pratiques, avec sources' },
-  { id: 'strategy', label: 'Jeux de stratégie', description: 'Échecs et jeux de plateau du monde entier' },
-  { id: 'arts', label: 'Arts et culture', description: 'Littérature, musique, arts visuels' },
+  { id: 'languages', label: 'Langues', description: 'Vocabulaire, grammaire, conversation', color: '#7cc4ff' },
+  { id: 'sciences', label: 'Maths et sciences', description: 'Calcul, raisonnement, sciences de la nature', color: '#5ce1b6' },
+  { id: 'humanities', label: 'Histoire et société', description: 'Histoire, géographie, idées', color: '#e8b04b' },
+  { id: 'religions', label: 'Religions et spiritualités', description: 'Croyances, textes, pratiques, avec sources', color: '#d8c69f' },
+  { id: 'strategy', label: 'Jeux de stratégie', description: 'Échecs et jeux de plateau du monde entier', color: '#ff7a59' },
+  { id: 'arts', label: 'Arts et culture', description: 'Littérature, musique, arts visuels', color: '#f29ec8' },
 ];
 
 export const SUBJECT_CATALOG: SubjectMeta[] = [
   // Langues
-  { id: 'english', label: 'Anglais', category: 'languages', emoji: 'EN' },
-  { id: 'spanish', label: 'Espagnol', category: 'languages', emoji: 'ES' },
-  { id: 'german', label: 'Allemand', category: 'languages', emoji: 'DE' },
-  { id: 'italian', label: 'Italien', category: 'languages', emoji: 'IT' },
-  { id: 'portuguese', label: 'Portugais', category: 'languages', emoji: 'PT', keywords: ['brésilien'] },
-  { id: 'dutch', label: 'Néerlandais', category: 'languages', emoji: 'NL', keywords: ['flamand', 'hollandais'] },
-  { id: 'arabic', label: 'Arabe', category: 'languages', emoji: 'ع', keywords: ['arabe littéraire', 'fusha'] },
-  { id: 'turkish', label: 'Turc', category: 'languages', emoji: 'TR' },
-  { id: 'russian', label: 'Russe', category: 'languages', emoji: 'Ру' },
-  { id: 'polish', label: 'Polonais', category: 'languages', emoji: 'PL' },
-  { id: 'greek', label: 'Grec', category: 'languages', emoji: 'Ελ' },
-  { id: 'hebrew', label: 'Hébreu', category: 'languages', emoji: 'עב' },
-  { id: 'chinese', label: 'Chinois (mandarin)', category: 'languages', emoji: '中', keywords: ['mandarin'] },
-  { id: 'japanese', label: 'Japonais', category: 'languages', emoji: 'あ' },
-  { id: 'korean', label: 'Coréen', category: 'languages', emoji: '한' },
-  { id: 'hindi', label: 'Hindi', category: 'languages', emoji: 'हि' },
-  { id: 'swahili', label: 'Swahili', category: 'languages', emoji: 'SW' },
-  { id: 'french', label: 'Français', category: 'languages', emoji: 'FR', keywords: ['fle', 'orthographe'] },
-  { id: 'latin', label: 'Latin', category: 'languages', emoji: 'LA' },
+  { id: 'english', label: 'Anglais', category: 'languages', glyph: 'EN' },
+  { id: 'spanish', label: 'Espagnol', category: 'languages', glyph: 'ES' },
+  { id: 'german', label: 'Allemand', category: 'languages', glyph: 'DE' },
+  { id: 'italian', label: 'Italien', category: 'languages', glyph: 'IT' },
+  { id: 'portuguese', label: 'Portugais', category: 'languages', glyph: 'PT', keywords: ['brésilien'] },
+  { id: 'dutch', label: 'Néerlandais', category: 'languages', glyph: 'NL', keywords: ['flamand', 'hollandais'] },
+  { id: 'arabic', label: 'Arabe', category: 'languages', glyph: 'ع', keywords: ['arabe littéraire', 'fusha'] },
+  { id: 'turkish', label: 'Turc', category: 'languages', glyph: 'TR' },
+  { id: 'russian', label: 'Russe', category: 'languages', glyph: 'Ру' },
+  { id: 'polish', label: 'Polonais', category: 'languages', glyph: 'PL' },
+  { id: 'greek', label: 'Grec', category: 'languages', glyph: 'Ελ' },
+  { id: 'hebrew', label: 'Hébreu', category: 'languages', glyph: 'עב' },
+  { id: 'chinese', label: 'Chinois (mandarin)', category: 'languages', glyph: '中', keywords: ['mandarin'] },
+  { id: 'japanese', label: 'Japonais', category: 'languages', glyph: 'あ' },
+  { id: 'korean', label: 'Coréen', category: 'languages', glyph: '한' },
+  { id: 'hindi', label: 'Hindi', category: 'languages', glyph: 'हि' },
+  { id: 'swahili', label: 'Swahili', category: 'languages', glyph: 'SW' },
+  { id: 'french', label: 'Français', category: 'languages', glyph: 'FR', keywords: ['fle', 'orthographe'] },
+  { id: 'latin', label: 'Latin', category: 'languages', glyph: 'LA' },
 
   // Maths et sciences
-  { id: 'math', label: 'Mathématiques', category: 'sciences', emoji: '∑', keywords: ['maths', 'algèbre', 'géométrie'] },
-  { id: 'physics', label: 'Physique', category: 'sciences', emoji: '⚛' },
-  { id: 'chemistry', label: 'Chimie', category: 'sciences', emoji: '⚗' },
-  { id: 'biology', label: 'Biologie', category: 'sciences', emoji: '🧬', keywords: ['svt'] },
-  { id: 'programming', label: 'Programmation', category: 'sciences', emoji: '💻', keywords: ['code', 'informatique', 'python'] },
-  { id: 'astronomy', label: 'Astronomie', category: 'sciences', emoji: '🔭' },
+  { id: 'math', label: 'Mathématiques', category: 'sciences', glyph: '∑', keywords: ['maths', 'algèbre', 'géométrie'] },
+  { id: 'physics', label: 'Physique', category: 'sciences', glyph: 'Φ' },
+  { id: 'chemistry', label: 'Chimie', category: 'sciences', glyph: 'Ch' },
+  { id: 'biology', label: 'Biologie', category: 'sciences', glyph: 'Bi', keywords: ['svt'] },
+  { id: 'programming', label: 'Programmation', category: 'sciences', glyph: '</>', keywords: ['code', 'informatique', 'python'] },
+  { id: 'astronomy', label: 'Astronomie', category: 'sciences', glyph: '☾' },
 
   // Histoire et société
-  { id: 'history', label: 'Histoire', category: 'humanities', emoji: '🏛' },
-  { id: 'geography', label: 'Géographie', category: 'humanities', emoji: '🗺', keywords: ['capitales', 'pays'] },
-  { id: 'philosophy', label: 'Philosophie', category: 'humanities', emoji: '💡' },
-  { id: 'economics', label: 'Économie', category: 'humanities', emoji: '📈' },
+  { id: 'history', label: 'Histoire', category: 'humanities', glyph: 'Ⅻ' },
+  { id: 'geography', label: 'Géographie', category: 'humanities', glyph: '⊕', keywords: ['capitales', 'pays'] },
+  { id: 'philosophy', label: 'Philosophie', category: 'humanities', glyph: '∴' },
+  { id: 'economics', label: 'Économie', category: 'humanities', glyph: '€' },
 
   // Religions et spiritualités
-  { id: 'islam', label: 'Islam', category: 'religions', emoji: '☪', keywords: ['coran', 'sîra', 'hadith'] },
-  { id: 'christianity', label: 'Christianisme', category: 'religions', emoji: '✝', keywords: ['bible', 'évangile'] },
-  { id: 'judaism', label: 'Judaïsme', category: 'religions', emoji: '✡', keywords: ['torah', 'talmud'] },
+  { id: 'islam', label: 'Islam', category: 'religions', glyph: '☪', keywords: ['coran', 'sîra', 'hadith'] },
+  { id: 'christianity', label: 'Christianisme', category: 'religions', glyph: '✝', keywords: ['bible', 'évangile'] },
+  { id: 'judaism', label: 'Judaïsme', category: 'religions', glyph: '✡', keywords: ['torah', 'talmud'] },
 
   // Jeux de stratégie
-  { id: 'chess', label: 'Échecs', category: 'strategy', emoji: '♟' },
-  { id: 'shogi', label: 'Shogi (échecs japonais)', category: 'strategy', emoji: '☖', keywords: ['japon'] },
-  { id: 'xiangqi', label: 'Xiangqi (échecs chinois)', category: 'strategy', emoji: '帥', keywords: ['chine'] },
-  { id: 'go', label: 'Go', category: 'strategy', emoji: '碁', keywords: ['weiqi', 'baduk'] },
-  { id: 'draughts', label: 'Dames', category: 'strategy', emoji: '⛀', keywords: ['jeu de dames'] },
+  { id: 'chess', label: 'Échecs', category: 'strategy', glyph: '♞' },
+  { id: 'shogi', label: 'Shogi (échecs japonais)', category: 'strategy', glyph: '将', keywords: ['japon'] },
+  { id: 'xiangqi', label: 'Xiangqi (échecs chinois)', category: 'strategy', glyph: '帥', keywords: ['chine'] },
+  { id: 'go', label: 'Go', category: 'strategy', glyph: '碁', keywords: ['weiqi', 'baduk'] },
+  { id: 'draughts', label: 'Dames', category: 'strategy', glyph: '◎', keywords: ['jeu de dames'] },
 
   // Arts et culture
-  { id: 'literature', label: 'Littérature', category: 'arts', emoji: '📚' },
-  { id: 'music', label: 'Musique et solfège', category: 'arts', emoji: '🎵', keywords: ['solfège'] },
-  { id: 'art-history', label: 'Histoire de l’art', category: 'arts', emoji: '🎨', keywords: ['peinture'] },
+  { id: 'literature', label: 'Littérature', category: 'arts', glyph: '¶' },
+  { id: 'music', label: 'Musique et solfège', category: 'arts', glyph: '♪', keywords: ['solfège'] },
+  { id: 'art-history', label: 'Histoire de l’art', category: 'arts', glyph: '✎', keywords: ['peinture'] },
 ];
 
 const byId = new Map(SUBJECT_CATALOG.map((s) => [s.id, s]));
 
 export function subjectMeta(id: SubjectId): SubjectMeta | undefined {
   return byId.get(id);
+}
+
+export function categoryOf(id: SubjectId): Category | undefined {
+  const meta = byId.get(id);
+  return meta ? CATEGORIES.find((c) => c.id === meta.category) : undefined;
+}
+
+/** Couleur de planète d'une matière (celle de sa catégorie). */
+export function subjectColor(id: SubjectId): string {
+  return categoryOf(id)?.color ?? '#e8b04b';
 }
 
 export function subjectLabel(id: SubjectId): string {

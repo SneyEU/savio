@@ -1,32 +1,41 @@
 /*
  * Design system Savio — jetons.
- * Univers : la carte marine. Fond « papier de carte » bleu-gris, encre marine,
- * ambre de balise pour l'action et la progression, sarcelle pour l'eau et le calme.
+ * Univers : le ciel de nuit. Apprendre, c'est allumer des étoiles une à une et tracer sa constellation.
+ * Savi, la petite comète, accompagne l'apprenant. Ambre « comète » pour l'action, menthe pour la réussite,
+ * violet électrique pour la profondeur, rose pour les erreurs (jamais de rouge agressif).
  */
 :root {
-  /* Couleurs — clair */
-  --c-bg: #edf1f3;
-  --c-surface: #ffffff;
-  --c-surface-sunk: #e2e8ec;
-  --c-ink: #14233a;
-  --c-ink-soft: #3d4f66;
-  --c-muted: #5d6d80;
-  --c-line: #cfd8df;
-  --c-beacon: #f2b23e; /* remplissages, progression */
-  --c-beacon-ink: #8a5a06; /* texte ambre lisible sur fond clair */
-  --c-on-beacon: #14233a;
-  --c-tide: #1f7a75;
-  --c-tide-soft: #d5ecea;
-  --c-danger: #b4433a;
-  --c-danger-soft: #f6dedb;
-  --c-focus: #1f6fd1;
+  /* Couleurs — nuit (identité par défaut) */
+  --c-bg: #0f0c29;
+  --c-bg-glow: #2a1f6e;
+  --c-surface: #1d1948;
+  --c-surface-2: #252061;
+  --c-surface-sunk: #151236;
+  --c-ink: #f6f3ff;
+  --c-ink-soft: #d3cdf7;
+  --c-muted: #a39cd3;
+  --c-line: #332c74;
+  --c-beacon: #ffb938;
+  --c-beacon-deep: #d98a00;
+  --c-beacon-ink: #ffc95e;
+  --c-on-beacon: #2b1900;
+  --c-tide: #3ee6b0;
+  --c-tide-deep: #17a77c;
+  --c-tide-soft: #1b3f4d;
+  --c-violet: #8b6cff;
+  --c-violet-deep: #5a3fd6;
+  --c-pink: #ff6f9c;
+  --c-pink-deep: #d6406f;
+  --c-danger: #ff7d9c;
+  --c-danger-soft: #3d1638;
+  --c-focus: #9ec2ff;
 
-  /* Échelons de maîtrise (du plus clair au plus profond, comme une sonde) */
-  --c-m-new: #cfd8df;
-  --c-m-learning: #f6d48f;
-  --c-m-fragile: #f2b23e;
-  --c-m-known: #4db6ac;
-  --c-m-mastered: #1f7a75;
+  /* Échelons de maîtrise : de l'étoile éteinte à l'étoile brillante */
+  --c-m-new: #3a3380;
+  --c-m-learning: #8b6cff;
+  --c-m-fragile: #ffb938;
+  --c-m-known: #3ee6b0;
+  --c-m-mastered: #ffffff;
 
   /* Typographie */
   --font-display: 'Fredoka', 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
@@ -36,9 +45,9 @@
   --fs-md: 1.0625rem;
   --fs-lg: 1.375rem;
   --fs-xl: 1.875rem;
-  --fs-2xl: 2.75rem;
+  --fs-2xl: 3rem;
   --lh-body: 1.55;
-  --lh-tight: 1.12;
+  --lh-tight: 1.08;
 
   /* Espacement (base 4 px) */
   --s-1: 4px;
@@ -50,53 +59,68 @@
   --s-7: 48px;
   --s-8: 64px;
 
-  /* Rayons : petit pour les contrôles, plus grand pour les surfaces de lecture */
-  --r-control: 8px;
-  --r-surface: 14px;
+  /* Rayons : contrôles « bonbon », surfaces très arrondies */
+  --r-control: 14px;
+  --r-surface: 24px;
   --r-pill: 999px;
 
-  --shadow-lift: 0 1px 2px rgb(20 35 58 / 0.06), 0 8px 24px -12px rgb(20 35 58 / 0.18);
+  /* Profondeur : les boutons ont une épaisseur, comme des touches */
+  --depth: 5px;
+  --shadow-lift: 0 18px 40px -18px rgb(5 2 30 / 0.7);
+  --glow-beacon: 0 0 0 1px rgb(255 185 56 / 0.35), 0 10px 40px -8px rgb(255 185 56 / 0.45);
+
+  /* Mouvement */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --dur-fast: 120ms;
-  --dur-med: 240ms;
+  --ease-spring: linear(0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.9%, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 140ms;
+  --dur-med: 280ms;
+  --dur-slow: 600ms;
 }
 
-:root[data-theme='dark'] {
-  --c-bg: #0e1a2b;
-  --c-surface: #15243a;
-  --c-surface-sunk: #0b1524;
-  --c-ink: #e6edf5;
-  --c-ink-soft: #c3cfdc;
-  --c-muted: #93a3b8;
-  --c-line: #26384f;
-  --c-beacon-ink: #f2b23e;
-  --c-tide: #4db6ac;
-  --c-tide-soft: #173a3d;
-  --c-danger: #e57d72;
-  --c-danger-soft: #3a1f22;
-  --c-focus: #7fb2ff;
-  --c-m-new: #26384f;
-  --c-m-learning: #6b5426;
-  --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 28px -14px rgb(0 0 0 / 0.6);
+/* Jour : même univers, ciel d'aube */
+:root[data-theme='light'] {
+  --c-bg: #f4f1ff;
+  --c-bg-glow: #ffe3b0;
+  --c-surface: #ffffff;
+  --c-surface-2: #f7f4ff;
+  --c-surface-sunk: #ebe6ff;
+  --c-ink: #1b1547;
+  --c-ink-soft: #3b3478;
+  --c-muted: #6c66a0;
+  --c-line: #ddd6fb;
+  --c-beacon-ink: #a15f00;
+  --c-tide: #10b981;
+  --c-tide-deep: #0b8a60;
+  --c-tide-soft: #d5f6ea;
+  --c-danger: #d6406f;
+  --c-danger-soft: #ffe1ea;
+  --c-focus: #3d5afe;
+  --c-m-new: #ddd6fb;
+  --c-m-mastered: #1b1547;
+  --shadow-lift: 0 18px 40px -22px rgb(40 20 120 / 0.35);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root[data-theme='system'] {
-    --c-bg: #0e1a2b;
-    --c-surface: #15243a;
-    --c-surface-sunk: #0b1524;
-    --c-ink: #e6edf5;
-    --c-ink-soft: #c3cfdc;
-    --c-muted: #93a3b8;
-    --c-line: #26384f;
-    --c-beacon-ink: #f2b23e;
-    --c-tide: #4db6ac;
-    --c-tide-soft: #173a3d;
-    --c-danger: #e57d72;
-    --c-danger-soft: #3a1f22;
-    --c-focus: #7fb2ff;
-    --c-m-new: #26384f;
-    --c-m-learning: #6b5426;
-    --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 28px -14px rgb(0 0 0 / 0.6);
+    --c-bg: #f4f1ff;
+    --c-bg-glow: #ffe3b0;
+    --c-surface: #ffffff;
+    --c-surface-2: #f7f4ff;
+    --c-surface-sunk: #ebe6ff;
+    --c-ink: #1b1547;
+    --c-ink-soft: #3b3478;
+    --c-muted: #6c66a0;
+    --c-line: #ddd6fb;
+    --c-beacon-ink: #a15f00;
+    --c-tide: #10b981;
+    --c-tide-deep: #0b8a60;
+    --c-tide-soft: #d5f6ea;
+    --c-danger: #d6406f;
+    --c-danger-soft: #ffe1ea;
+    --c-focus: #3d5afe;
+    --c-m-new: #ddd6fb;
+    --c-m-mastered: #1b1547;
+    --shadow-lift: 0 18px 40px -22px rgb(40 20 120 / 0.35);
   }
 }

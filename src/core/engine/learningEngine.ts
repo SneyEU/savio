@@ -4,7 +4,7 @@ import { levelFromXp, xpForReview, type LevelProgress } from '../gamification/xp
 import { buildLearnerSnapshot, type LearnerSnapshot } from '../learner/learnerModel';
 import type { Clock, IdGenerator, Repositories } from '../ports';
 import { DEFAULT_SCHEDULER_OPTIONS, schedule, type SchedulerOptions } from '../srs/fsrs';
-import { masteryDistribution } from '../srs/mastery';
+import { masteryDistribution, masteryStage } from '../srs/mastery';
 import { planSession, recommendBySubject, type SessionPlan, type SubjectRecommendation } from './sessionPlanner';
 
 export interface ReviewOutcome {
@@ -29,6 +29,8 @@ export interface ProgressSummary {
   dueCount: number;
   mastery: ReturnType<typeof masteryDistribution>;
   recommendations: SubjectRecommendation[];
+  /** Force de chaque matière (0 → 1), d'après l'échelon de maîtrise de ses éléments. */
+  subjectStrength: Record<SubjectId, number>;
 }
 
 /**
@@ -145,6 +147,7 @@ export class LearningEngine {
       dailyGoalMinutes: profile?.dailyGoalMinutes ?? 15,
       dueCount: due.filter(enrolled).length,
       mastery: masteryDistribution(allItems.filter(enrolled).map((i) => i.srs)),
+      subjectStrength: subjectStrength(allItems.filter(enrolled)),
       recommendations: recommendBySubject(
         subjects.map((s) => s.subjectId),
         due.filter(enrolled),
@@ -167,4 +170,18 @@ export function interleaveBySubject(items: readonly ReviewItem[]): ReviewItem[] 
     }
   }
   return result;
+}
+
+const STAGE_WEIGHT = { new: 0, learning: 0.25, fragile: 0.5, known: 0.8, mastered: 1 } as const;
+
+/** Moyenne pondérée des échelons de maîtrise, par matière. */
+export function subjectStrength(items: readonly ReviewItem[]): Record<SubjectId, number> {
+  const sums = new Map<SubjectId, { total: number; weight: number }>();
+  for (const item of items) {
+    const entry = sums.get(item.subjectId) ?? { total: 0, weight: 0 };
+    entry.total += 1;
+    entry.weight += STAGE_WEIGHT[masteryStage(item.srs)];
+    sums.set(item.subjectId, entry);
+  }
+  return Object.fromEntries([...sums].map(([id, { total, weight }]) => [id, total > 0 ? weight / total : 0]));
 }

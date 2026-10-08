@@ -8,6 +8,8 @@ Document de reprise : à lire en premier pour savoir où en est le projet.
 
 ### Fait
 
+- **8 oct., 12 h 30** : refonte artistique complète « Orrery » (voir `docs/DESIGN.md`) : planétarium au centre de l’accueil, dock flottant, transitions entre écrans avec morphing, mode séance plein écran avec cartes 3D et retours animés, séquence de fin et cérémonie de niveau, tuteur incarné par un noyau animé avec lecture à voix haute locale, onboarding où le système se forme, glyphes au lieu d’emojis
+
 - **8 oct., 11 h 45** : objectif quotidien par paliers de 5 à 120 min (sélecteur à jalons inspiré de 21st.dev), l’objectif n’est plus une limite (séances bonus de 5 min, « Objectif du jour atteint »), police Fredoka pour l’interface (OFL), Atkinson Hyperlegible pour la lecture
 
 - **8 oct., 11 h** : mises à jour automatiques signées (bandeau au démarrage, section Réglages → Mises à jour, workflow « Publier une version »). Clé publique dans `tauri.conf.json` ; la clé privée vit uniquement dans les secrets GitHub du mainteneur.

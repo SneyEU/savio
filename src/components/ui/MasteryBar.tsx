@@ -1,28 +1,35 @@
 import type { MasteryStage } from '../../core/domain/types';
 import { MASTERY_LABELS_FR } from '../../core/srs/mastery';
 
-const ORDER: MasteryStage[] = ['mastered', 'known', 'fragile', 'learning', 'new'];
+const ORDER: MasteryStage[] = ['new', 'learning', 'fragile', 'known', 'mastered'];
+const MAX_DOTS = 48;
 
-/** Répartition des éléments par échelon de maîtrise, du plus solide au plus neuf. */
+/**
+ * Le spectre de maîtrise : chaque carte est une étoile, rangée par éclat,
+ * de l'étoile éteinte (nouveau) à l'étoile brillante (maîtrisé). On voit d'un coup d'œil où se trouve la masse.
+ */
 export function MasteryBar({ distribution }: { distribution: Record<MasteryStage, number> }) {
   const total = ORDER.reduce((sum, s) => sum + distribution[s], 0);
-  if (total === 0) return <p className="muted">Aucun élément pour le moment.</p>;
+  if (total === 0) return <p className="muted">Ta constellation est vide pour l’instant. Ta première séance va l’allumer.</p>;
 
   return (
-    <div className="mastery">
-      <div className="mastery-bar" role="img" aria-label={ORDER.map((s) => `${MASTERY_LABELS_FR[s]} : ${distribution[s]}`).join(', ')}>
-        {ORDER.filter((s) => distribution[s] > 0).map((s) => (
-          <span key={s} className={`mastery-seg m-${s}`} style={{ flexGrow: distribution[s] }} />
-        ))}
-      </div>
-      <ul className="mastery-legend">
-        {ORDER.map((s) => (
-          <li key={s}>
-            <span className={`mastery-dot m-${s}`} aria-hidden="true" />
-            {MASTERY_LABELS_FR[s]} <strong>{distribution[s]}</strong>
-          </li>
-        ))}
-      </ul>
+    <div className="mastery" role="img" aria-label={ORDER.map((s) => `${MASTERY_LABELS_FR[s]} : ${distribution[s]}`).join(', ')}>
+      {ORDER.map((stage, col) => {
+        const count = distribution[stage];
+        const shown = Math.min(MAX_DOTS, count);
+        return (
+          <div key={stage} className={`mastery-col m-${stage}`}>
+            <div className="mastery-dots">
+              {Array.from({ length: shown }, (_, i) => (
+                <span key={i} className="mastery-dot" style={{ animationDelay: `${col * 90 + i * 14}ms` }} />
+              ))}
+              {count > MAX_DOTS && <span className="mastery-more">+{count - MAX_DOTS}</span>}
+            </div>
+            <strong className="mastery-count">{count}</strong>
+            <span className="mastery-label">{MASTERY_LABELS_FR[stage]}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
