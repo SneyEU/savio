@@ -32,11 +32,12 @@ Document de reprise : à lire en premier pour savoir où en est le projet.
 | Typage strict de `src/core`, `src/infrastructure/memory` et `tests` | ✅ |
 | Bundle de l’interface + parcours complet dans un navigateur (onboarding → révision → tuteur → réglages, clair et sombre) | ✅ aucune erreur |
 | `rustfmt` | ✅ |
-| `npm install`, ESLint, typage des composants React, `cargo build` | ⏳ à confirmer au premier `npm install` / premier passage de la CI |
+| CI GitHub : `npm install`, ESLint, typage complet, tests, build web, `cargo fmt` + `clippy` | ✅ vert au premier passage |
+| Build Windows : installateur NSIS (artifact `savio-windows-setup`) | ✅ généré en ~13 min |
 
 ### À faire tout de suite (par l’humain)
 
-1. Créer le dépôt GitHub public et pousser le code.
+1. ~~Créer le dépôt GitHub public et pousser le code~~ : fait (github.com/SneyEU/savio).
 2. Ajouter le fichier `LICENSE` : sur GitHub, **Add file → Create new file**, nommer `LICENSE`, choisir le modèle **GNU Affero General Public License v3.0**.
 3. `npm install` puis committer `package-lock.json` (rend la CI reproductible).
 4. ~~Remplacer `OWNER`~~ fait (SneyEU).
