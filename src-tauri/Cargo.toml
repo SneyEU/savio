@@ -1,6 +1,6 @@
 [package]
 name = "savio"
-version = "0.3.0"
+version = "0.4.0"
 description = "Savio — plateforme éducative IA libre et locale"
 authors = ["Contributeurs de Savio"]
 license = "AGPL-3.0-or-later"
