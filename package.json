@@ -1,7 +1,7 @@
 {
   "name": "savio",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Plateforme éducative IA libre, gratuite et locale : révision espacée, tuteur IA, langues, échecs, islam et plus.",
   "license": "AGPL-3.0-or-later",
   "type": "module",
