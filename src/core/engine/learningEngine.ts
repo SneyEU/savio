@@ -46,12 +46,24 @@ export class LearningEngine {
 
   async planToday(minutesAvailable: number, subjectId?: SubjectId): Promise<SessionPlan> {
     const now = this.clock.now();
-    const [due, fresh, snapshot] = await Promise.all([
+    const [due, fresh, snapshot, active] = await Promise.all([
       this.repos.items.listDue(now, 500, subjectId),
-      this.repos.items.listNew(50, subjectId),
+      this.repos.items.listNew(200, subjectId),
       this.snapshot(subjectId),
+      this.activeSubjects(),
     ]);
-    return planSession({ dueItems: due, newItems: fresh, minutesAvailable, weakSkills: snapshot.weakSkills });
+    // Les matières retirées par l'utilisateur gardent leur historique mais ne reviennent plus en session.
+    const enrolled = (item: ReviewItem) => active.has(item.subjectId);
+    return planSession({
+      dueItems: due.filter(enrolled),
+      newItems: interleaveBySubject(fresh.filter(enrolled)),
+      minutesAvailable,
+      weakSkills: snapshot.weakSkills,
+    });
+  }
+
+  private async activeSubjects(): Promise<Set<SubjectId>> {
+    return new Set((await this.repos.subjects.list()).map((s) => s.subjectId));
   }
 
   async recordReview(itemId: Id, rating: Rating, responseMs: number, mistake?: MistakeInput): Promise<ReviewOutcome> {
@@ -120,6 +132,8 @@ export class LearningEngine {
       this.repos.items.listDue(now, 1000),
       this.repos.items.listNew(1000),
     ]);
+    const active = new Set(subjects.map((s) => s.subjectId));
+    const enrolled = (item: ReviewItem) => active.has(item.subjectId);
     const totalXp = activities.reduce((sum, a) => sum + a.xp, 0);
     const todayActivity = activities.find((a) => a.day === today);
     return {
@@ -129,13 +143,28 @@ export class LearningEngine {
       todayMinutes: todayActivity?.minutes ?? 0,
       todayXp: todayActivity?.xp ?? 0,
       dailyGoalMinutes: profile?.dailyGoalMinutes ?? 15,
-      dueCount: due.length,
-      mastery: masteryDistribution(allItems.map((i) => i.srs)),
+      dueCount: due.filter(enrolled).length,
+      mastery: masteryDistribution(allItems.filter(enrolled).map((i) => i.srs)),
       recommendations: recommendBySubject(
         subjects.map((s) => s.subjectId),
-        due,
-        fresh,
+        due.filter(enrolled),
+        fresh.filter(enrolled),
       ),
     };
   }
+}
+
+/** Alterne les matières dans la liste des nouveautés, pour éviter dix cartes d'affilée sur le même sujet. */
+export function interleaveBySubject(items: readonly ReviewItem[]): ReviewItem[] {
+  const groups = new Map<SubjectId, ReviewItem[]>();
+  for (const item of items) groups.set(item.subjectId, [...(groups.get(item.subjectId) ?? []), item]);
+  const queues = [...groups.values()];
+  const result: ReviewItem[] = [];
+  while (queues.some((q) => q.length > 0)) {
+    for (const q of queues) {
+      const next = q.shift();
+      if (next) result.push(next);
+    }
+  }
+  return result;
 }

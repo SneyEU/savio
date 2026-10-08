@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { MasteryBar } from '../../components/ui/MasteryBar';
 import { Wake } from '../../components/ui/Wake';
-import { SUBJECT_CATALOG } from '../../core/content/starterDecks';
+import { subjectMeta } from '../../core/content/catalog';
+import { hasStarterContent } from '../../core/content/starterDecks';
 import type { DailyActivity } from '../../core/domain/types';
 import type { SessionPlan } from '../../core/engine/sessionPlanner';
 import { toLocalDay } from '../../core/gamification/streak';
@@ -79,7 +80,7 @@ export function Dashboard() {
         <h3 id="subjects-title">Tes matières</h3>
         <ul className="subject-list">
           {progress.recommendations.map((r) => {
-            const meta = SUBJECT_CATALOG.find((s) => s.id === r.subjectId);
+            const meta = subjectMeta(r.subjectId);
             return (
               <li key={r.subjectId}>
                 <span className="subject-emoji" aria-hidden="true">
@@ -89,7 +90,7 @@ export function Dashboard() {
                 <span className="muted subject-status">
                   {r.action === 'review' && `${r.dueCount} à réviser`}
                   {r.action === 'learn' && `${r.newAvailable} nouveauté${r.newAvailable > 1 ? 's' : ''}`}
-                  {r.action === 'up_to_date' && (meta?.hasStarterContent ? 'À jour' : 'Disponible avec le tuteur')}
+                  {r.action === 'up_to_date' && (hasStarterContent(r.subjectId) ? 'À jour' : 'Disponible avec le tuteur')}
                 </span>
               </li>
             );

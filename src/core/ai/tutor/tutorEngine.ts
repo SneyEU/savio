@@ -1,4 +1,4 @@
-import { subjectLabel } from '../../content/starterDecks';
+import { subjectLabel } from '../../content/catalog';
 import type { AiMessage, SubjectId } from '../../domain/types';
 import { describeForTutor } from '../../learner/learnerModel';
 import type { LearningEngine } from '../../engine/learningEngine';

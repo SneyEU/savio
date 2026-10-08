@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
+import { SubjectPicker } from '../../components/SubjectPicker';
 import { createProvider } from '../../core/ai/gateway';
+import type { SubjectId } from '../../core/domain/types';
+import { enrollSubjects } from '../../core/engine/onboarding';
 import type { ProviderConfig, ProviderHealth } from '../../core/ai/types';
 import { applyProviderConfig, currentProviderConfig, SETTINGS } from '../../services/container';
 import { exportAllData, exportFileName } from '../../services/dataService';
@@ -16,6 +19,8 @@ type Kind = ProviderConfig['kind'];
 export function Settings() {
   const theme = useApp((s) => s.theme);
   const profile = useApp((s) => s.profile);
+  const enrolled = useApp((s) => s.subjects);
+  const [picked, setPicked] = useState<Set<SubjectId>>(() => new Set(enrolled.map((e) => e.subjectId)));
   const platform = services().platform;
   const [kind, setKind] = useState<Kind>('ollama');
   const [baseUrl, setBaseUrl] = useState('http://127.0.0.1:11434');
@@ -57,6 +62,25 @@ export function Settings() {
     setSaved('Objectif quotidien enregistré.');
   }
 
+  async function saveSubjects() {
+    const svc = services();
+    const current = new Set(enrolled.map((e) => e.subjectId));
+    const added = [...picked].filter((id) => !current.has(id));
+    const removed = [...current].filter((id) => !picked.has(id));
+    const cards = await enrollSubjects(
+      added.map((subjectId) => ({ subjectId, level: 'beginner' as const })),
+      svc.repos,
+      svc.clock,
+    );
+    for (const id of removed) await svc.repos.subjects.remove(id);
+    await actions.refresh();
+    setSaved(
+      `Matières enregistrées : ${added.length} ajoutée${added.length > 1 ? 's' : ''}, ${removed.length} retirée${removed.length > 1 ? 's' : ''}` +
+        (cards > 0 ? `, ${cards} nouvelles cartes.` : '.') +
+        (removed.length > 0 ? ' Ta progression sur les matières retirées est conservée.' : ''),
+    );
+  }
+
   async function exportData() {
     const svc = services();
     const now = svc.clock.now();
@@ -82,6 +106,26 @@ export function Settings() {
         <div>
           <button type="button" className="btn btn-secondary" onClick={saveGoal}>
             Enregistrer l’objectif
+          </button>
+        </div>
+      </section>
+
+      <section className="surface stack" aria-labelledby="s-subjects">
+        <h3 id="s-subjects">Mes matières</h3>
+        <SubjectPicker
+          selected={picked}
+          onToggle={(id) =>
+            setPicked((prev) => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              return next;
+            })
+          }
+        />
+        <div>
+          <button type="button" className="btn btn-primary" disabled={picked.size === 0} onClick={saveSubjects}>
+            Enregistrer mes matières
           </button>
         </div>
       </section>

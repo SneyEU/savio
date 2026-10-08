@@ -66,10 +66,25 @@ export async function completeOnboarding(
   };
   await repos.profile.save(profile);
 
-  const existingItems = await repos.items.list();
-  const existingKeys = new Set(existingItems.map((i) => i.id));
+  await enrollSubjects(answers.subjects, repos, clock);
+  return profile;
+}
 
-  for (const { subjectId, level } of answers.subjects) {
+/**
+ * Inscrit des matières et charge leur contenu de démarrage (sans doublon).
+ * Utilisé par l'onboarding et par les réglages (ajout de matières plus tard).
+ */
+export async function enrollSubjects(
+  subjects: readonly { subjectId: SubjectId; level: DeclaredLevel }[],
+  repos: Repositories,
+  clock: Clock,
+): Promise<number> {
+  const now = clock.now();
+  const iso = now.toISOString();
+  const existingKeys = new Set((await repos.items.list()).map((i) => i.id));
+  let added = 0;
+
+  for (const { subjectId, level } of subjects) {
     await repos.subjects.save({ subjectId, level, enrolledAt: iso });
     const deck = STARTER_DECKS[subjectId];
     if (!deck) continue;
@@ -91,6 +106,7 @@ export async function completeOnboarding(
         updatedAt: iso,
       }));
     await repos.items.saveMany(items);
+    added += items.length;
   }
-  return profile;
+  return added;
 }

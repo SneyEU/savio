@@ -9,7 +9,8 @@ export type IsoDateTime = string;
 /** Jour local au format "YYYY-MM-DD". */
 export type LocalDay = string;
 
-export type SubjectId = 'spanish' | 'english' | 'french' | 'arabic' | 'german' | 'italian' | 'chess' | 'islam' | 'math';
+/** Identifiant de matière, défini dans le catalogue (`core/content/catalog.ts`). Extensible par des plugins. */
+export type SubjectId = string;
 
 export type DeclaredLevel = 'beginner' | 'intermediate' | 'advanced';
 
@@ -56,7 +57,16 @@ export interface SrsState {
   dueAt: IsoDateTime;
 }
 
-export type ReviewItemKind = 'vocabulary' | 'concept' | 'rule' | 'formula' | 'date' | 'definition' | 'fact' | 'memorization' | 'chess_opening';
+export type ReviewItemKind =
+  | 'vocabulary'
+  | 'concept'
+  | 'rule'
+  | 'formula'
+  | 'date'
+  | 'definition'
+  | 'fact'
+  | 'memorization'
+  | 'chess_opening';
 
 /** Unité de base de la mémorisation : un mot, une règle, une ouverture, un verset… */
 export interface ReviewItem {

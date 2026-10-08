@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { SUBJECT_CATALOG } from '../../core/content/starterDecks';
+import { subjectMeta } from '../../core/content/catalog';
 import { Rating, type ReviewItem } from '../../core/domain/types';
 import { actions, services, useApp } from '../../app/store';
 
@@ -120,7 +120,7 @@ export function ReviewSession() {
     );
   }
 
-  const subject = SUBJECT_CATALOG.find((s) => s.id === current.subjectId);
+  const subject = subjectMeta(current.subjectId);
   const isNew = current.srs.reps === 0;
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { SUBJECT_CATALOG } from '../../core/content/starterDecks';
+import { SubjectPicker } from '../../components/SubjectPicker';
+import { subjectMeta } from '../../core/content/catalog';
 import type { DeclaredLevel, Motivation, SubjectId } from '../../core/domain/types';
 import { completeOnboarding, proposeDailyPlan, validateOnboarding, type OnboardingAnswers } from '../../core/engine/onboarding';
 import { actions, services } from '../../app/store';
@@ -94,26 +95,14 @@ export function Onboarding() {
           <section className="stack">
             <h2>Qu’est-ce que tu veux apprendre ?</h2>
             <p className="muted">Tu pourras en ajouter d’autres plus tard.</p>
-            <div className="choice-grid">
-              {SUBJECT_CATALOG.map((s) => (
-                <button key={s.id} type="button" className="choice" aria-pressed={!!levelOf(s.id)} onClick={() => toggleSubject(s.id)}>
-                  <span className="choice-emoji" aria-hidden="true">
-                    {s.emoji}
-                  </span>
-                  <span>
-                    {s.label}
-                    {!s.hasStarterContent && <small>Avec le tuteur IA</small>}
-                  </span>
-                </button>
-              ))}
-            </div>
+            <SubjectPicker selected={new Set(answers.subjects.map((s) => s.subjectId))} onToggle={toggleSubject} />
             {answers.subjects.length > 0 && (
               <div className="stack">
                 <span className="field-label">Ton niveau</span>
                 {answers.subjects.map(({ subjectId, level }) => (
                   <div key={subjectId} className="row level-row">
-                    <span className="level-subject">{SUBJECT_CATALOG.find((s) => s.id === subjectId)?.label}</span>
-                    <div className="segmented" role="radiogroup" aria-label={`Niveau en ${subjectId}`}>
+                    <span className="level-subject">{subjectMeta(subjectId)?.emoji} {subjectMeta(subjectId)?.label}</span>
+                    <div className="segmented" role="radiogroup" aria-label={`Niveau en ${subjectMeta(subjectId)?.label ?? subjectId}`}>
                       {LEVELS.map((l) => (
                         <button key={l.id} type="button" role="radio" aria-checked={level === l.id} onClick={() => setLevel(subjectId, l.id)}>
                           {l.label}

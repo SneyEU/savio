@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LocalityBadge } from '../../components/ui/LocalityBadge';
 import { parseFlashcards, type FlashcardSuggestion } from '../../core/ai/tutor/tutorEngine';
 import type { Locality } from '../../core/ai/types';
-import { SUBJECT_CATALOG } from '../../core/content/starterDecks';
+import { SUBJECT_CATALOG } from '../../core/content/catalog';
 import type { SubjectId } from '../../core/domain/types';
 import { newSrsState } from '../../core/srs/fsrs';
 import { SETTINGS } from '../../services/container';

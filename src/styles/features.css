@@ -63,7 +63,7 @@ kbd {
 }
 
 .onboarding-card {
-  width: min(680px, 100%);
+  width: min(780px, 100%);
   display: flex;
   flex-direction: column;
   gap: var(--s-6);
@@ -100,10 +100,19 @@ kbd {
   font-weight: 700;
 }
 
-.choice-emoji {
-  font-size: 1.4rem;
-  width: 1.6em;
-  text-align: center;
+.choice-emoji,
+.subject-emoji {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-control);
+  background: var(--c-surface-sunk);
+  color: var(--c-ink);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .level-row {
@@ -261,12 +270,6 @@ kbd {
   gap: var(--s-3);
   padding: var(--s-3) var(--s-1);
   border-bottom: 1px solid var(--c-line);
-}
-
-.subject-emoji {
-  width: 1.8em;
-  font-size: 1.2rem;
-  text-align: center;
 }
 
 .subject-name {
@@ -573,4 +576,86 @@ kbd {
   .onboarding-card {
     padding: var(--s-5);
   }
+}
+
+/* ——— Choix des matières ——— */
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.picker-tabs {
+  display: flex;
+  gap: var(--s-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.picker-tabs button {
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  color: var(--c-ink-soft);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.picker-tabs button[aria-selected='true'] {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-bg);
+  font-weight: 700;
+}
+
+.picker-scroll {
+  max-height: min(52vh, 440px);
+  overflow-y: auto;
+  padding: var(--s-1) var(--s-2) var(--s-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  scrollbar-width: thin;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+}
+
+.picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.picker-group header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--s-1) 0;
+  background: var(--c-surface);
+}
+
+.settings .picker-group header,
+.onboarding-card .picker-group header {
+  background: var(--c-surface);
+}
+
+.picker-group h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+}
+
+.picker-group header .muted {
+  font-size: var(--fs-xs);
+}
+
+.picker-count {
+  font-size: var(--fs-sm);
 }
