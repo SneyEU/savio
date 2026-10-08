@@ -1,0 +1,85 @@
+name: Publier une version
+
+# Depuis GitHub : onglet Actions → « Publier une version » → Run workflow → saisir la version (ex. 0.2.0).
+# Le workflow met à jour le numéro de version, crée le tag, construit l'installateur signé
+# et publie la Release avec le fichier latest.json lu par la mise à jour automatique de l'application.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Nouvelle version (ex. 0.2.0), supérieure à la version actuelle'
+        required: true
+      notes:
+        description: 'Nouveautés affichées aux utilisateurs (facultatif)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Numéro de version et tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Vérifier les secrets de signature
+        env:
+          KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEY" ] || [ -z "$PASSWORD" ]; then
+            echo "::error::Ajoute les secrets TAURI_SIGNING_PRIVATE_KEY et TAURI_SIGNING_PRIVATE_KEY_PASSWORD (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+      - name: Appliquer la version
+        run: node scripts/set-version.mjs "${{ inputs.version }}"
+      - name: Commit et tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Version ${{ inputs.version }}"
+          git tag "v${{ inputs.version }}"
+          git push origin HEAD:main "v${{ inputs.version }}"
+
+  windows:
+    name: Installateur signé et Release
+    needs: tag
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ inputs.version }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - name: Installation
+        shell: bash
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Tests
+        run: npm test
+      - name: Build, signature et publication
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          args: --config src-tauri/tauri.release.conf.json
+          tagName: v${{ inputs.version }}
+          releaseName: Savio ${{ inputs.version }}
+          releaseBody: ${{ inputs.notes != '' && inputs.notes || 'Nouvelle version de Savio. Si Savio est déjà installé, la mise à jour se propose toute seule au prochain lancement.' }}
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true

@@ -1,5 +1,5 @@
 //! Shell natif de Savio : base SQLite locale, accès HTTP restreint au réseau local
-//! (modèles IA locaux), et export des données de l'utilisateur.
+//! (modèles IA locaux), export des données de l'utilisateur et mises à jour signées.
 
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
@@ -45,6 +45,13 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_process::init())
+        .setup(|app| {
+            #[cfg(desktop)]
+            app.handle()
+                .plugin(tauri_plugin_updater::Builder::new().build())?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![save_export])
         .run(tauri::generate_context!())
         .expect("erreur au lancement de Savio");

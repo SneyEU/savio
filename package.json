@@ -21,14 +21,17 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "check": "npm run lint && npm run typecheck && npm run test"
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "version:set": "node scripts/set-version.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.1.0",
     "@fontsource/bricolage-grotesque": "^5.1.0",
     "@tauri-apps/api": "^2.7.0",
     "@tauri-apps/plugin-http": "^2.5.0",
+    "@tauri-apps/plugin-process": "^2.2.0",
     "@tauri-apps/plugin-sql": "^2.3.0",
+    "@tauri-apps/plugin-updater": "^2.7.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

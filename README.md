@@ -123,12 +123,17 @@ Couvre l’algorithme FSRS, les échelons de maîtrise, l’XP, la série de jou
 - `ci.yml` : lint, types, tests et build à chaque push et pull request ; vérification `cargo fmt` et `clippy` du shell Tauri.
 - `build-windows.yml` : construit l’installateur sur `windows-latest` à chaque push sur `main` (artifact **savio-windows-setup**) et crée un brouillon de Release pour chaque tag `v*.*.*`.
 
-Publier une version :
+## Mises à jour automatiques
 
-```powershell
-git tag v0.1.0
-git push origin v0.1.0
-```
+Une fois Savio installé, il vérifie au démarrage si une nouvelle version existe sur GitHub. Si oui, un bandeau propose **Mettre à jour** : téléchargement, installation et redémarrage se font tout seuls, sans perdre la progression. Chaque mise à jour est **signée** ; l'application refuse un fichier dont la signature ne correspond pas. La vérification peut être désactivée dans **Réglages → Mises à jour**.
+
+### Publier une nouvelle version (mainteneurs)
+
+1. Une seule fois : ajouter les secrets `TAURI_SIGNING_PRIVATE_KEY` et `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` dans **Settings → Secrets and variables → Actions**.
+2. Onglet **Actions → Publier une version → Run workflow**, saisir la version (ex. `0.2.0`) et, si on veut, les nouveautés.
+3. Le workflow met à jour le numéro de version, crée le tag, construit l'installateur signé et publie la Release. Les utilisateurs reçoivent la proposition de mise à jour au lancement suivant.
+
+La clé privée de signature ne doit jamais être commitée ni partagée. Si elle est perdue, les versions déjà installées ne pourront plus se mettre à jour automatiquement : il faudra réinstaller manuellement une version signée avec une nouvelle clé.
 
 ## Roadmap
 

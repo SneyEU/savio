@@ -6,6 +6,7 @@ import { enrollSubjects } from '../../core/engine/onboarding';
 import type { ProviderConfig, ProviderHealth } from '../../core/ai/types';
 import { applyProviderConfig, currentProviderConfig, SETTINGS } from '../../services/container';
 import { exportAllData, exportFileName } from '../../services/dataService';
+import { checkForUpdate, currentAppVersion, UPDATE_SETTING, type AvailableUpdate } from '../../services/updates';
 import { actions, services, useApp, type ThemeChoice } from '../../app/store';
 
 const THEMES: { id: ThemeChoice; label: string }[] = [
@@ -30,6 +31,10 @@ export function Settings() {
   const [saveHistory, setSaveHistory] = useState(true);
   const [goal, setGoal] = useState(profile?.dailyGoalMinutes ?? 15);
   const [confirmWipe, setConfirmWipe] = useState(false);
+  const [version, setVersion] = useState<string | null>(null);
+  const [autoUpdate, setAutoUpdate] = useState(true);
+  const [updateState, setUpdateState] = useState<{ status: 'idle' | 'checking' | 'none' | 'error' | 'installing'; detail?: string }>({ status: 'idle' });
+  const [available, setAvailable] = useState<AvailableUpdate | null>(null);
 
   useEffect(() => {
     const svc = services();
@@ -41,7 +46,21 @@ export function Settings() {
       }
     });
     void svc.repos.settings.get<boolean>(SETTINGS.saveAiHistory).then((v) => setSaveHistory(v ?? true));
+    void svc.repos.settings.get<boolean>(UPDATE_SETTING).then((v) => setAutoUpdate(v ?? true));
+    void currentAppVersion().then(setVersion);
   }, []);
+
+  async function lookForUpdate() {
+    setUpdateState({ status: 'checking' });
+    setAvailable(null);
+    try {
+      const update = await checkForUpdate();
+      setAvailable(update);
+      setUpdateState(update ? { status: 'idle' } : { status: 'none' });
+    } catch (e) {
+      setUpdateState({ status: 'error', detail: e instanceof Error ? e.message : String(e) });
+    }
+  }
 
   const config = (): ProviderConfig => (kind === 'offline' ? { kind } : { kind, baseUrl: baseUrl.trim(), model: model.trim() });
 
@@ -191,6 +210,63 @@ export function Settings() {
         </div>
       </section>
 
+      <section className="surface stack" aria-labelledby="s-updates">
+        <h3 id="s-updates">Mises à jour</h3>
+        {platform === 'tauri' ? (
+          <>
+            <p>
+              Version installée : <strong>{version ?? '…'}</strong>
+            </p>
+            <label className="row checkbox">
+              <input
+                type="checkbox"
+                checked={autoUpdate}
+                onChange={async (e) => {
+                  setAutoUpdate(e.target.checked);
+                  await services().repos.settings.set(UPDATE_SETTING, e.target.checked);
+                }}
+              />
+              Rechercher les mises à jour au démarrage
+            </label>
+            <p className="muted">La vérification contacte GitHub et n’envoie aucune donnée personnelle. Chaque mise à jour est signée et vérifiée avant installation.</p>
+            {updateState.status === 'none' && <p className="notice">Savio est à jour.</p>}
+            {updateState.status === 'error' && <p className="notice notice-danger">Vérification impossible : {updateState.detail}. Vérifie ta connexion Internet.</p>}
+            {updateState.status === 'installing' && <p className="notice">{updateState.detail}</p>}
+            {available && updateState.status !== 'installing' && (
+              <p className="notice">
+                La version {available.version} est disponible.
+                {available.notes ? ` ${available.notes}` : ''}
+              </p>
+            )}
+            <div className="row">
+              <button type="button" className="btn btn-secondary" disabled={updateState.status === 'checking' || updateState.status === 'installing'} onClick={lookForUpdate}>
+                {updateState.status === 'checking' ? 'Recherche…' : 'Rechercher une mise à jour'}
+              </button>
+              {available && (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={updateState.status === 'installing'}
+                  onClick={async () => {
+                    try {
+                      await available.install((p) =>
+                        setUpdateState({ status: 'installing', detail: p === null ? 'Téléchargement…' : `Téléchargement ${Math.round(p * 100)} % — Savio redémarrera tout seul.` }),
+                      );
+                    } catch (e) {
+                      setUpdateState({ status: 'error', detail: e instanceof Error ? e.message : String(e) });
+                    }
+                  }}
+                >
+                  Installer la version {available.version}
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <p className="muted">Les mises à jour automatiques fonctionnent dans l’application installée.</p>
+        )}
+      </section>
+
       <section className="surface stack" aria-labelledby="s-privacy">
         <h3 id="s-privacy">Confidentialité et données</h3>
         <label className="row checkbox">
@@ -246,7 +322,7 @@ export function Settings() {
         </div>
       </section>
 
-      <p className="muted">Savio 0.1.0 — logiciel libre sous licence AGPL-3.0-or-later.</p>
+      <p className="muted">Savio{version ? ` ${version}` : ''} — logiciel libre sous licence AGPL-3.0-or-later.</p>
     </div>
   );
 }

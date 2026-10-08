@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { UpdateBanner } from '../components/UpdateBanner';
 import { Assistant } from '../features/assistant/Assistant';
 import { Dashboard } from '../features/dashboard/Dashboard';
 import { Onboarding } from '../features/onboarding/Onboarding';
@@ -60,6 +61,7 @@ export function App() {
         <p className="sidebar-foot">Libre, gratuit, et tes données restent ici.</p>
       </nav>
       <main className="main">
+        <UpdateBanner />
         {route === 'dashboard' && <Dashboard />}
         {route === 'review' && <ReviewSession key="review" />}
         {route === 'assistant' && <Assistant />}

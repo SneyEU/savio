@@ -27,23 +27,47 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": [
+      "nsis"
+    ],
     "category": "Education",
     "shortDescription": "Compagnon d'apprentissage libre et local",
     "copyright": "Contributeurs de Savio — AGPL-3.0-or-later",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.png", "icons/icon.ico"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.ico"
+    ],
     "windows": {
-      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["French", "English"],
+        "languages": [
+          "French",
+          "English"
+        ],
         "displayLanguageSelector": false
       }
     }
   },
   "plugins": {
     "sql": {
-      "preload": ["sqlite:savio.db"]
+      "preload": [
+        "sqlite:savio.db"
+      ]
+    },
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ0OTkxQjNEQzc2RDA2ODUKUldTRkJtM0hQUnVaMUQrZmdYOHlkeDhhajBTTDV1cVczUVRkRThDOGJqVGVUeHcrTzZ3QWU2VE0K",
+      "endpoints": [
+        "https://github.com/SneyEU/savio/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }
